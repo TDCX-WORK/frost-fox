@@ -1,0 +1,579 @@
+/* ═══════════════════════════════════════════════════════════════
+   FROSTFOX NOSOTROS — minimalismo quirúrgico, tono blanco
+   ═══════════════════════════════════════════════════════════════ */
+
+.section {
+  position: relative;
+  background: #f5f7fa;
+  border-radius: 36px 36px 36px 36px;
+  margin-top: -36px;
+  z-index: 9;
+  padding: 110px 0 120px;
+  overflow: hidden;
+}
+
+/* línea top sutil */
+.section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 8%; width: 84%; height: 1px;
+  background: linear-gradient(to right,
+    transparent,
+    rgba(37,99,235,0.12) 30%,
+    rgba(37,99,235,0.22) 50%,
+    rgba(37,99,235,0.12) 70%,
+    transparent
+  );
+}
+
+/* ── Flickering grid ── */
+.gridWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Fade en todos los bordes — mismo patrón que Clients */
+  /* Visible en el centro, se desvanece hacia los 4 bordes */
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 45%, transparent 100%);
+}
+
+/* ── Content ── */
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOP BLOCK — headline + logo
+   ══════════════════════════════════════════════════════════════ */
+.topBlock {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 48px;
+  align-items: center;
+}
+
+.topLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.headline {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 7vw, 88px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  color: #0f172a;
+}
+
+.headlineLight {
+  color: #94a3b8;   /* gris claro — contraste editorial */
+}
+
+.lead {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #475569;
+  line-height: 1.72;
+  max-width: 440px;
+}
+
+/* Logo flotante — sin card, grandecito, a la derecha */
+.logoFloatWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  justify-self: center;
+}
+
+.logoFloat {
+  width: 200px;
+  height: 200px;
+  will-change: transform;
+}
+
+.logoImg {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: contrast(1.05) brightness(0.88);
+  /* Sin background, sin padding, sin border — solo la imagen */
+}
+
+.logoShadowSvg {
+  width: 160px;
+  height: 18px;
+  margin-top: 8px;
+  will-change: transform, opacity;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STATS STRIP — separador horizontal
+   ══════════════════════════════════════════════════════════════ */
+.statsStrip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid rgba(37,99,235,0.14);
+  border-bottom: 1px solid rgba(37,99,235,0.14);
+  padding: 32px 0;
+  box-shadow:
+    0 1px 0 rgba(37,99,235,0.08),
+    0 -1px 0 rgba(37,99,235,0.08),
+    0 0 24px rgba(37,99,235,0.05);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 0 32px;
+  border-left: 1px solid rgba(0,0,0,0.07);
+}
+
+.stat:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.statVal {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.statLbl {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PILARES ROW — tres cards con hover oscuro
+   ══════════════════════════════════════════════════════════════ */
+.pilaresRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;        /* gap mínimo, efecto panel */
+  background: rgba(0,0,0,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.pilarCard {
+  position: relative;
+  background: #fff;
+  padding: 36px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  cursor: default;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+/* Fondo oscuro que aparece en hover */
+.pilarBg {
+  position: absolute;
+  inset: 0;
+  background: #0f172a;
+  pointer-events: none;
+}
+
+/* Todo el texto encima del bg */
+.pilarTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.pilarNum {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+}
+
+.pilarCard:hover .pilarNum { color: #475569; }
+
+.pilarTag {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2563eb;
+  background: rgba(37,99,235,0.07);
+  border: 1px solid rgba(37,99,235,0.15);
+  padding: 3px 9px;
+  border-radius: 999px;
+  position: relative;
+  z-index: 1;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.pilarCard:hover .pilarTag {
+  background: rgba(37,99,235,0.15);
+  color: #93c5fd;
+  border-color: rgba(37,99,235,0.3);
+}
+
+.pilarHeadline {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s;
+  flex: 1;
+}
+
+.pilarCard:hover .pilarHeadline { color: #f1f5f9; }
+
+.pilarBody {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: #94a3b8;
+  line-height: 1.65;
+  position: relative;
+  z-index: 1;
+}
+
+/* Línea azul inferior que aparece en hover */
+.pilarLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #2563eb, #0ea5e9);
+  transform-origin: left;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CTA — tipografía editorial, sin card
+   ══════════════════════════════════════════════════════════════ */
+.ctaBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 48px 0 0;
+  border-top: 1px solid rgba(0,0,0,0.07);
+}
+
+.ctaEyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.ctaHeadline {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(56px, 8vw, 96px);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.ctaPrimary {
+  height: 52px;
+  padding: 0 32px;
+  border-radius: 14px;
+  background: #0f172a;
+  border: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.ctaPrimary:hover {
+  background: #1e293b;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+}
+
+.ctaSecondary {
+  height: 52px;
+  padding: 0 28px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.ctaSecondary:hover {
+  border-color: #0f172a;
+  color: #0f172a;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   ACCORDION — solo mobile, oculto en desktop
+   ══════════════════════════════════════════════════════════════ */
+.accordion {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 20px;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.accordionItem {
+  overflow: hidden;
+  transition: background 0.35s;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+/* gap entre items lo gestiona el contenedor */
+
+.accordionItemOpen {
+  background: #0f172a;
+  border-color: rgba(37,99,235,0.25);
+  box-shadow: 0 4px 24px rgba(15,23,42,0.18), 0 0 0 1px rgba(37,99,235,0.15);
+}
+
+/* Trigger — fila clickable */
+.accordionTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 22px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.accordionTriggerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.accordionNum {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #cbd5e1;
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+
+.accordionItemOpen .accordionNum { color: #475569; }
+
+.accordionHeadline {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: color 0.3s;
+}
+
+.accordionItemOpen .accordionHeadline { color: #f1f5f9; }
+
+.accordionRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.accordionTag {
+  font-family: 'Syne', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2563eb;
+  background: rgba(37,99,235,0.07);
+  border: 1px solid rgba(37,99,235,0.15);
+  padding: 3px 8px;
+  border-radius: 999px;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.accordionItemOpen .accordionTag {
+  background: rgba(37,99,235,0.18);
+  color: #93c5fd;
+  border-color: rgba(37,99,235,0.3);
+}
+
+.accordionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #64748b;
+  line-height: 1;
+  will-change: transform;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+  flex-shrink: 0;
+}
+
+.accordionItemOpen .accordionIcon {
+  border-color: rgba(37,99,235,0.4);
+  color: #93c5fd;
+  background: rgba(37,99,235,0.12);
+}
+
+/* Panel */
+.accordionPanel {
+  /* height y opacity manejados por motion */
+}
+
+.accordionBody {
+  padding: 0 22px 26px 50px;  /* 22px borde + 14px gap + ~14px num = alineado con headline */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accordionText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14.5px;
+  color: #94a3b8;
+  line-height: 1.7;
+}
+
+.accordionLine {
+  height: 2px;
+  background: linear-gradient(to right, #2563eb, #0ea5e9);
+  border-radius: 999px;
+  transform-origin: left;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .topBlock { grid-template-columns: 1fr 200px; gap: 32px; }
+  .logoFloat { width: 160px; height: 160px; }
+  .pilaresRow { grid-template-columns: 1fr; }
+  .pilarCard { min-height: auto; }
+}
+
+@media (max-width: 768px) {
+  .section  { padding: 72px 0 80px; border-radius: 28px; }
+  .content  { padding: 0 24px; gap: 56px; }
+
+  .topBlock { grid-template-columns: 1fr; gap: 32px; }
+  .topLeft { align-items: center; text-align: center; }
+  .lead { max-width: 100%; text-align: center; }
+  .logoFloatWrap { justify-self: center; align-items: center; }
+
+  .logoFloat { width: 110px; height: 110px; }
+  .logoShadowSvg { width: 110px; }
+
+  .headline { font-size: clamp(44px, 12vw, 64px); }
+
+  .statsStrip {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    /* Glow sutil en los bordes del strip */
+    box-shadow:
+      0 1px 0 rgba(37,99,235,0.12),
+      0 -1px 0 rgba(37,99,235,0.12),
+      0 0 18px rgba(37,99,235,0.06);
+    border-top: 1px solid rgba(37,99,235,0.18) !important;
+    border-bottom: 1px solid rgba(37,99,235,0.18) !important;
+  }
+
+  .stat {
+    padding: 20px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    align-items: center;
+    text-align: center;
+  }
+
+  .stat:nth-child(odd) {
+    padding-left: 16px;
+    border-left: none;
+  }
+
+  .stat:nth-last-child(-n+2) { border-bottom: none; }
+
+  .statVal { font-size: 28px; }
+  .statLbl { text-align: center; }
+
+  /* Ocultar grid de cards, mostrar acordeón */
+  .pilaresRow { display: none; }
+  .accordion  { display: flex; }
+
+  .ctaHeadline { font-size: clamp(48px, 14vw, 72px); }
+  .ctaActions  { flex-direction: column; width: 100%; }
+  .ctaPrimary,
+  .ctaSecondary { width: 100%; }
+}

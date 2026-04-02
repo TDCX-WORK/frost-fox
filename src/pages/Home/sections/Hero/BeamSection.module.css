@@ -1,0 +1,116 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 0;
+  margin-top: 28px;
+  pointer-events: none;
+}
+
+/* Columnas */
+.colLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  z-index: 2;
+  pointer-events: all;
+}
+
+.colCenter,
+.colRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: all;
+}
+
+/* Nodo base — blanco */
+.nodeWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.node {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(42, 184, 212, 0.2);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 5px rgba(93, 228, 255, 0.05),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.nodeLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Nodo central — azul oscuro */
+.nodeFrostfox {
+  width: 68px;
+  height: 68px;
+  background: linear-gradient(135deg, #070d1a 0%, #0d2040 100%);
+  border: 1.5px solid rgba(93, 228, 255, 0.35);
+  box-shadow:
+    0 0 0 6px rgba(93, 228, 255, 0.08),
+    0 0 28px rgba(93, 228, 255, 0.25);
+}
+
+.logoFF {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #5de4ff;
+  letter-spacing: -0.02em;
+}
+
+
+/* ═══ RESPONSIVE — MOBILE ═══ */
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+    gap: 28px;
+    margin-top: 50px;
+    padding: 16px 0;
+    /* Give the wrapper real height so beams have room to draw long lines */
+    min-height: 420px;
+  }
+
+  .colLeft {
+    flex-direction: row;
+    gap: 32px;
+  }
+
+  .node {
+    width: 54px;
+    height: 54px;
+  }
+  .node svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nodeFrostfox {
+    width: 62px;
+    height: 62px;
+  }
+
+  .logoFF { font-size: 24px; }
+  .nodeLabel { font-size: 14px; color: #94a3b8; }
+}

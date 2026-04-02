@@ -1,0 +1,303 @@
+/* ─── OUTER: tall scrollable container ─── */
+.outer {
+  position: relative;
+  height: 500vh;
+  z-index: 7;
+}
+
+/* ─── STICKY VISUAL LAYER ─── */
+.section {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background: #070d1a;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+/* ── IZQUIERDA ── */
+.left {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.personImg {
+  position: relative;
+  z-index: 2;
+  height: 84vh;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom;
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+
+.glow {
+  position: absolute;
+  z-index: 1;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(93,228,255,0.07) 0%, transparent 70%);
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  height: 84%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(93,228,255,0.08) 20%, rgba(93,228,255,0.08) 80%, transparent);
+  pointer-events: none;
+}
+
+/* ── DERECHA ── */
+.right {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.arcSvg {
+  position: absolute;
+  top: 0; right: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.arcSvg circle { pointer-events: all; }
+
+.contentArea {
+  position: relative;
+  z-index: 2;
+  padding-left: 80px;
+  padding-right: 5vw;
+  width: 100%;
+}
+
+.serviceCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.number {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.8rem, 1.1vw, 1rem);
+  color: rgba(93,228,255,0.55);
+  letter-spacing: 0.14em;
+  display: block;
+}
+
+.title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.1;
+  color: #f0f8ff;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.description {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(200,220,255,0.55);
+  max-width: 380px;
+  margin: 0;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(93,228,255,0.07);
+  border: 1px solid rgba(93,228,255,0.18);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #5de4ff;
+  letter-spacing: 0.06em;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  right: 3vw;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.progressDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(93,228,255,0.2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s;
+}
+
+.progressDotPassed { background: rgba(93,228,255,0.5); }
+
+.progressDotActive {
+  background: #5de4ff;
+  box-shadow: 0 0 8px rgba(93,228,255,0.9);
+  width: 5px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+
+/* ── MOBILE PERSON (hidden on desktop) ── */
+.mobilePersonWrap {
+  display: none;
+}
+
+.mobilePersonImg {
+  width: auto;
+  object-fit: contain;
+}
+
+.mobileGlow {
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(93,228,255,0.08) 0%, transparent 70%);
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE  (≤ 768px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .outer {
+    height: 350vh;
+  }
+
+  .section {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 130px 7vw 0;
+  }
+
+  /* Hide desktop person + glow + divider line */
+  .left { display: none; }
+  .section::after { display: none; }
+
+  .right {
+    width: 100%;
+    height: auto;
+    justify-content: center;
+  }
+
+  /* Hide arc on mobile */
+  .arcSvg { display: none; }
+
+  .contentArea {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .serviceCard {
+    align-items: center;
+    text-align: center;
+  }
+
+  .description {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 7vw, 2.2rem);
+  }
+
+  .tags {
+    justify-content: center;
+  }
+
+  /* Progress dots horizontal */
+  .progress {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .progressDotActive {
+    width: 14px;
+    height: 5px;
+    border-radius: 3px;
+  }
+
+  /* Show mobile person below content */
+  .mobilePersonWrap {
+    display: flex;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-end;
+    margin-top: 32px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .mobilePersonImg {
+    position: relative;
+    z-index: 2;
+    height: 42vh;
+    max-height: 380px;
+    -webkit-mask-image: linear-gradient(to top, black 50%, transparent 100%);
+    mask-image: linear-gradient(to top, black 50%, transparent 100%);
+  }
+}
+
+/* ═══ TABLET ═══ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .contentArea {
+    padding-left: 40px;
+    padding-right: 3vw;
+  }
+
+  .left { width: 40%; }
+  .right { width: 60%; }
+}
