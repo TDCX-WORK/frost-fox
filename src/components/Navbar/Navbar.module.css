@@ -6,47 +6,52 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 20px;
 }
 
-/* ══ LOGO ══ */
-.logo {
+/* ══ LOGO FIXED — independiente del dock, alineado izquierda ══ */
+.logoFixed {
+  position: fixed;
+  top: 38px;
+  left: 5vw;
+  z-index: 101;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
   text-decoration: none;
-  flex-shrink: 0;
 }
 
-.logoMark {
-  width: 34px;
-  height: 34px;
-  background: linear-gradient(135deg, #5de4ff 0%, #2ab8d4 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.logoFixedImg {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: brightness(1.1) drop-shadow(0 0 10px rgba(93,228,255,0.45));
+}
+
+.logoFixedText {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 14px;
-  color: #080c10;
-  box-shadow: 0 0 18px rgba(93, 228, 255, 0.4);
-  flex-shrink: 0;
-}
-
-.logoText {
-  font-family: 'Syne', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   color: #fff;
-  text-shadow:
-    0 0 0 #fff,
-    1px 1px 3px rgba(0,0,0,0.4),
-    -1px -1px 3px rgba(0,0,0,0.2);
   letter-spacing: 0.02em;
 }
 
-.logoAccent { color: #5de4ff; }
+.logoFixedAccent { color: #5de4ff; }
+
+
+/* ── logoDesktop: visible solo en desktop ── */
+.logoDesktop {
+  display: flex;   /* visible en desktop */
+}
+
+/* ── logoMobile: visible solo en mobile (dentro del nav) ── */
+.logoMobile {
+  display: none;   /* oculto en desktop */
+  position: static;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  order: 0;
+}
 
 /* ══ DOCK ══ */
 .dockOuter { display: flex; }
@@ -89,6 +94,9 @@
   padding: 0 6px;
   transition: background 0.2s;
   position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .dockLink:hover {
@@ -181,14 +189,19 @@
 
 .mobileLink {
   display: block;
+  width: 100%;
+  text-align: left;
   padding: 14px 0;
   font-family: 'Syne', sans-serif;
   font-weight: 600;
   font-size: 18px;
   color: #f0f8ff;
   text-decoration: none;
+  border: none;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: transparent;
   transition: color 0.2s;
+  cursor: pointer;
 }
 .mobileLink:hover { color: #5de4ff; }
 
@@ -219,10 +232,17 @@
     transform: none;
     width: auto;
     justify-content: space-between;
+    align-items: center;
   }
 
   /* Hide the desktop dock */
   .dockOuter { display: none; }
+
+  /* Mobile: ocultar logo desktop, mostrar logo mobile */
+  .logoDesktop { display: none !important; }
+  .logoMobile  { display: flex !important; }
+  .logoFixedImg { width: 30px; height: 30px; }
+  .logoFixedText { font-size: 15px; }
 
   /* Show hamburger */
   .burger { display: flex; }

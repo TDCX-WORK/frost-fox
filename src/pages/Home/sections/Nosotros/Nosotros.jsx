@@ -30,26 +30,15 @@ const PILARES = [
 ]
 
 // ─────────────────────────────────────────────────────────────
-// PILAR CARD — desktop hover reveal oscuro
+// PILAR CARD — desktop hover reveal oscuro — pure CSS, zero JS on hover
 // ─────────────────────────────────────────────────────────────
 function PilarCard({ p, i }) {
-  const [hovered, setHovered] = useState(false)
-
   return (
-    <motion.div
+    <div
       className={styles.pilarCard}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+      style={{ animationDelay: `${i * 0.12}s` }}
     >
-      <motion.div
-        className={styles.pilarBg}
-        animate={{ opacity: hovered ? 1 : 0 }}
-        transition={{ duration: 0.35 }}
-      />
+      <div className={styles.pilarBg} />
       <div className={styles.pilarTop}>
         <span className={styles.pilarNum}>{p.num}</span>
         <span className={styles.pilarTag}>{p.tag}</span>
@@ -57,19 +46,9 @@ function PilarCard({ p, i }) {
       <h3 className={styles.pilarHeadline}>
         {p.headline.split("\n").map((l, j) => <span key={j}>{l}<br /></span>)}
       </h3>
-      <motion.p
-        className={styles.pilarBody}
-        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 8 }}
-        transition={{ duration: 0.3 }}
-      >
-        {p.body}
-      </motion.p>
-      <motion.div
-        className={styles.pilarLine}
-        animate={{ scaleX: hovered ? 1 : 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      />
-    </motion.div>
+      <p className={styles.pilarBody}>{p.body}</p>
+      <div className={styles.pilarLine} />
+    </div>
   )
 }
 
@@ -117,16 +96,9 @@ function PilaresAccordion() {
               </div>
             </button>
 
-            {/* Panel expandible */}
-            <motion.div
-              className={styles.accordionPanel}
-              initial={false}
-              animate={{
-                height: isOpen ? "auto" : 0,
-                opacity: isOpen ? 1 : 0,
-              }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ overflow: "hidden" }}
+            {/* Panel expandible — CSS maxHeight for smooth 60fps */}
+            <div
+              className={cn(styles.accordionPanel, isOpen && styles.accordionPanelOpen)}
             >
               <div className={styles.accordionBody}>
                 <p className={styles.accordionText}>{p.body}</p>
@@ -138,7 +110,7 @@ function PilaresAccordion() {
                   transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 />
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         )
       })}

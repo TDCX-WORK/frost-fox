@@ -193,15 +193,31 @@
   cursor: default;
   overflow: hidden;
   min-height: 280px;
+  /* entrance animation */
+  animation: pilarIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* GPU layer — prevents hover from triggering repaints on siblings */
+  isolation: isolate;
 }
 
-/* Fondo oscuro que aparece en hover */
+@keyframes pilarIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fondo oscuro — GPU opacity only */
 .pilarBg {
   position: absolute;
   inset: 0;
   background: #0f172a;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  /* force own compositing layer */
+  will-change: opacity;
+  transform: translateZ(0);
 }
+
+.pilarCard:hover .pilarBg { opacity: 1; }
 
 /* Todo el texto encima del bg */
 .pilarTop {
@@ -218,7 +234,7 @@
   font-weight: 700;
   color: #cbd5e1;
   letter-spacing: 0.1em;
-  transition: color 0.3s;
+  transition: color 0.25s ease;
 }
 
 .pilarCard:hover .pilarNum { color: #475569; }
@@ -236,7 +252,7 @@
   border-radius: 999px;
   position: relative;
   z-index: 1;
-  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .pilarCard:hover .pilarTag {
@@ -254,7 +270,7 @@
   letter-spacing: -0.025em;
   position: relative;
   z-index: 1;
-  transition: color 0.3s;
+  transition: color 0.25s ease;
   flex: 1;
 }
 
@@ -267,19 +283,32 @@
   line-height: 1.65;
   position: relative;
   z-index: 1;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.16,1,0.3,1);
+  will-change: opacity, transform;
 }
 
-/* Línea azul inferior que aparece en hover */
+.pilarCard:hover .pilarBody {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Línea azul inferior */
 .pilarLine {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(to right, #2563eb, #0ea5e9);
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #5de4ff);
   transform-origin: left;
-  z-index: 2;
+  transform: scaleX(0);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
+
+.pilarCard:hover .pilarLine { transform: scaleX(1); }
 
 /* ══════════════════════════════════════════════════════════════
    CTA — tipografía editorial, sin card
@@ -376,7 +405,7 @@
 
 .accordionItem {
   overflow: hidden;
-  transition: background 0.35s;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   border-radius: 16px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.07);
@@ -491,7 +520,17 @@
 
 /* Panel */
 .accordionPanel {
-  /* height y opacity manejados por motion */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease;
+  will-change: max-height, opacity;
+}
+
+.accordionPanelOpen {
+  max-height: 200px;
+  opacity: 1;
 }
 
 .accordionBody {

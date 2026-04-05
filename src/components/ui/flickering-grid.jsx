@@ -11,131 +11,105 @@ export function FlickeringGrid({
   className,
   maxOpacity = 0.3,
 }) {
-  const canvasRef = useRef(null)
+  const canvasRef    = useRef(null)
   const containerRef = useRef(null)
   const [isInView, setIsInView] = useState(false)
 
   const memoizedColor = useMemo(() => {
-    const toRgb = (color) => {
-      const canvas = document.createElement("canvas")
-      canvas.width = canvas.height = 1
-      const ctx = canvas.getContext("2d")
-      ctx.fillStyle = color
-      ctx.fillRect(0, 0, 1, 1)
-      return ctx.getImageData(0, 0, 1, 1).data
-    }
-    const [r, g, b] = toRgb(color)
+    const c = document.createElement("canvas")
+    c.width = c.height = 1
+    const x = c.getContext("2d")
+    x.fillStyle = color
+    x.fillRect(0, 0, 1, 1)
+    const [r, g, b] = x.getImageData(0, 0, 1, 1).data
     return `${r}, ${g}, ${b}`
   }, [color])
 
-  const setupCanvas = useCallback(
-    (canvas, width, height) => {
-      const dpr = window.devicePixelRatio || 1
-      canvas.width = width * dpr
-      canvas.height = height * dpr
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-      const cols = Math.floor(width / (squareSize + gridGap))
-      const rows = Math.floor(height / (squareSize + gridGap))
+  const setupCanvas = useCallback((canvas, w, h) => {
+    const dpr = window.devicePixelRatio || 1
+    canvas.width  = w * dpr
+    canvas.height = h * dpr
+    canvas.style.width  = `${w}px`
+    canvas.style.height = `${h}px`
+    const cols = Math.floor(w / (squareSize + gridGap))
+    const rows = Math.floor(h / (squareSize + gridGap))
+    const len  = cols * rows
+    const current = new Float32Array(len)
+    const target  = new Float32Array(len)
+    const speed   = new Float32Array(len)
+    for (let i = 0; i < len; i++) {
+      current[i] = Math.random() * maxOpacity
+      target[i]  = Math.random() * maxOpacity
+      speed[i]   = 0.4 + Math.random() * 1.2
+    }
+    return { cols, rows, current, target, speed, dpr }
+  }, [squareSize, gridGap, maxOpacity])
 
-      const squares = new Float32Array(cols * rows)
-      for (let i = 0; i < squares.length; i++) {
-        squares[i] = Math.random() * maxOpacity
-      }
-      return { cols, rows, squares, dpr }
-    },
-    [squareSize, gridGap, maxOpacity]
-  )
-
-  const updateSquares = useCallback(
-    (squares, deltaTime) => {
-      for (let i = 0; i < squares.length; i++) {
-        if (Math.random() < flickerChance * deltaTime) {
-          squares[i] = Math.random() * maxOpacity
+  const tick = useCallback((params, deltaTime) => {
+    const { current, target, speed } = params
+    const dt = Math.min(deltaTime, 0.05)
+    for (let i = 0; i < current.length; i++) {
+      const diff = target[i] - current[i]
+      const step = speed[i] * dt
+      if (Math.abs(diff) <= step) {
+        current[i] = target[i]
+        if (Math.random() < flickerChance) {
+          target[i] = Math.random() * maxOpacity
+          speed[i]  = 0.4 + Math.random() * 1.2
         }
+      } else {
+        current[i] += diff > 0 ? step : -step
       }
-    },
-    [flickerChance, maxOpacity]
-  )
+    }
+  }, [flickerChance, maxOpacity])
 
-  const drawGrid = useCallback(
-    (ctx, width, height, cols, rows, squares, dpr) => {
-      ctx.clearRect(0, 0, width, height)
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const opacity = squares[i * rows + j]
-          ctx.fillStyle = `rgba(${memoizedColor}, ${opacity})`
-          ctx.fillRect(
-            i * (squareSize + gridGap) * dpr,
-            j * (squareSize + gridGap) * dpr,
-            squareSize * dpr,
-            squareSize * dpr
-          )
-        }
+  const draw = useCallback((ctx, cw, ch, cols, rows, current, dpr) => {
+    ctx.clearRect(0, 0, cw, ch)
+    const sq = squareSize * dpr
+    const gp = (squareSize + gridGap) * dpr
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const op = current[i * rows + j]
+        if (op < 0.003) continue
+        ctx.fillStyle = `rgba(${memoizedColor}, ${op})`
+        ctx.fillRect(i * gp, j * gp, sq, sq)
       }
-    },
-    [memoizedColor, squareSize, gridGap]
-  )
+    }
+  }, [memoizedColor, squareSize, gridGap])
 
   useEffect(() => {
-    const canvas = canvasRef.current
+    const canvas    = canvasRef.current
     const container = containerRef.current
     if (!canvas || !container) return
-
     const ctx = canvas.getContext("2d")
-    let animationFrameId
-    let gridParams
-
-    const updateCanvasSize = () => {
-      const newWidth = width || container.clientWidth
-      const newHeight = height || container.clientHeight
-      gridParams = setupCanvas(canvas, newWidth, newHeight)
+    let rafId, params
+    const resize = () => {
+      const w = width  || container.clientWidth
+      const h = height || container.clientHeight
+      params = setupCanvas(canvas, w, h)
     }
-
-    updateCanvasSize()
-
+    resize()
     let lastTime = performance.now()
-
-    const animate = (time) => {
-      if (!isInView) {
-        animationFrameId = requestAnimationFrame(animate)
-        return
-      }
-      const deltaTime = (time - lastTime) / 1000
-      lastTime = time
-      updateSquares(gridParams.squares, deltaTime)
-      drawGrid(
-        ctx,
-        canvas.width,
-        canvas.height,
-        gridParams.cols,
-        gridParams.rows,
-        gridParams.squares,
-        gridParams.dpr
-      )
-      animationFrameId = requestAnimationFrame(animate)
+    const animate = (now) => {
+      rafId = requestAnimationFrame(animate)
+      if (!isInView || !params) return
+      const dt = (now - lastTime) / 1000
+      lastTime = now
+      tick(params, dt)
+      draw(ctx, canvas.width, canvas.height, params.cols, params.rows, params.current, params.dpr)
     }
-
-    animationFrameId = requestAnimationFrame(animate)
-
-    const resizeObserver = new ResizeObserver(updateCanvasSize)
-    resizeObserver.observe(container)
-
-    return () => {
-      cancelAnimationFrame(animationFrameId)
-      resizeObserver.disconnect()
-    }
-  }, [setupCanvas, updateSquares, drawGrid, width, height, isInView])
+    rafId = requestAnimationFrame(animate)
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
+    return () => { cancelAnimationFrame(rafId); ro.disconnect() }
+  }, [setupCanvas, tick, draw, width, height, isInView])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold: 0 }
-    )
-    observer.observe(container)
-    return () => observer.disconnect()
+    const io = new IntersectionObserver(([e]) => setIsInView(e.isIntersecting), { threshold: 0 })
+    io.observe(container)
+    return () => io.disconnect()
   }, [])
 
   return (

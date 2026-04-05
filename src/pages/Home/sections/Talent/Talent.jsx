@@ -12,6 +12,8 @@ import styles from "./Talent.module.css"
 import personTalent from "../../../../assets/person-talent.webp"
 import ffLogo       from "../../../../assets/ff-logo-azul.webp"
 
+const WA_URL = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostFox, me gustaría hablar sobre FrostFox Talent y la Seamless Transition.")}`
+
 // ─────────────────────────────────────────────────────────────
 // BORDER BEAM WRAPPER — conic-gradient rotatorio (mismo patrón
 // que ShineCard de Academy: overflow:hidden + padding:1.5px)
@@ -363,9 +365,11 @@ function CtaCard() {
         <motion.button className={styles.ctaPrimary}
           whileHover={{ scale:1.04, boxShadow:"0 0 40px rgba(17,107,217,0.55)" }}
           whileTap={{ scale:0.97 }}
+          onClick={() => window.open(WA_URL, "_blank")}
         >Hablar con un experto →</motion.button>
         <motion.button className={styles.ctaSecondary}
           whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+          onClick={() => { const el = document.getElementById("contacto"); if(el) el.scrollIntoView({ behavior: "smooth" }) }}
         >Ver casos de éxito</motion.button>
       </div>
       <p className={styles.ctaNote}>Sin compromiso · Respuesta en menos de 24h · Confidencialidad garantizada</p>

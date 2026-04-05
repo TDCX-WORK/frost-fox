@@ -1,11 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react"
 import BeamSection from "./BeamSection"
-import { TypingAnimation } from "@/components/ui/typing-animation"
 import { motion } from "motion/react"
 import styles from "./Hero.module.css"
 
 import foxImg  from "../../../../assets/fox.webp"
 import codeImg from "../../../../assets/fox-code.webp"
+
+const WA_URL = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostFox, me gustaría obtener más información sobre vuestros servicios.")}`
 
 const DOTS = [
   { x: -15,  y: -205, size: 5, delay: 0.0  },
@@ -32,6 +33,63 @@ const DOTS = [
   { x:   10, y:   10, size: 3, delay: 1.6  },
 ]
 
+// ─────────────────────────────────────────────────────────────
+// SPLIT TEXT — por palabra, color reactivo al divisor
+// ─────────────────────────────────────────────────────────────
+function SplitText({ text, dividerPct, containerRef, colorLight, colorDark, className, style }) {
+  const words = text.split(" ")
+
+  return (
+    <span className={className} style={style}>
+      {words.map((word, i) => (
+        <WordSpan
+          key={i}
+          word={word}
+          isLast={i === words.length - 1}
+          dividerPct={dividerPct}
+          containerRef={containerRef}
+          colorLight={colorLight}
+          colorDark={colorDark}
+        />
+      ))}
+    </span>
+  )
+}
+
+function WordSpan({ word, isLast, dividerPct, containerRef, colorLight, colorDark }) {
+  const ref = useRef(null)
+  const [color, setColor] = useState(colorDark)
+
+  useEffect(() => {
+    const el = ref.current
+    const container = containerRef.current
+    if (!el || !container) return
+
+    const containerRect = container.getBoundingClientRect()
+    const wordRect      = el.getBoundingClientRect()
+
+    // Centro horizontal de la palabra en porcentaje del contenedor
+    const wordCenterPct = ((wordRect.left + wordRect.width / 2) - containerRect.left) / containerRect.width * 100
+
+    // Si el divisor ha pasado el centro de esta palabra → lado oscuro → color claro
+    setColor(dividerPct > wordCenterPct ? colorLight : colorDark)
+  }, [dividerPct, containerRef, colorLight, colorDark])
+
+  return (
+    <span
+      ref={ref}
+      style={{
+        color,
+        transition: "color 0.06s ease",
+        display: "inline",
+        whiteSpace: "pre",
+      }}
+    >
+      {word}{isLast ? "" : " "}
+    </span>
+  )
+}
+
 const LEFT_CENTER_DESKTOP  = 25
 const RIGHT_CENTER_DESKTOP = 75
 const MOBILE_CENTER        = 50
@@ -53,10 +111,6 @@ export default function Hero({ onDividerChange }) {
     return () => window.removeEventListener("resize", check)
   }, [])
 
-  const leftThreshold  = isMobile ? MOBILE_CENTER : LEFT_CENTER_DESKTOP
-  const rightThreshold = isMobile ? MOBILE_CENTER : RIGHT_CENTER_DESKTOP
-
-  /* Write divider to DOM via CSS var (GPU-smooth) AND React state (for color logic) */
   const applyDivider = useCallback((v) => {
     const el = containerRef.current
     if (el) {
@@ -67,7 +121,6 @@ export default function Hero({ onDividerChange }) {
     onDividerChange?.(v)
   }, [onDividerChange])
 
-  /* Intro animation */
   useEffect(() => {
     const timeout = setTimeout(() => {
       setReady(true)
@@ -85,7 +138,6 @@ export default function Hero({ onDividerChange }) {
     return () => clearTimeout(timeout)
   }, [applyDivider])
 
-  /* Drag — window-level listeners for smooth tracking even outside element */
   const updateFromPointer = useCallback((clientX) => {
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -122,10 +174,22 @@ export default function Hero({ onDividerChange }) {
     setIsDragging(true)
   }
 
+  // Colores según lado
+  const leftThreshold  = isMobile ? MOBILE_CENTER : LEFT_CENTER_DESKTOP
+  const rightThreshold = isMobile ? MOBILE_CENTER : RIGHT_CENTER_DESKTOP
+
+  // Headline izquierdo: está en zona oscura cuando dividerX > threshold
+  const headlineLightColor = "#f0f8ff"
+  const headlineDarkColor  = "#1a2540"
+
+  // Taglines derechos: están en zona blanca cuando dividerX < threshold
+  const taglineLightColor = "#f0f8ff"
+  const taglineDarkColor  = "#1a2540"
+
   return (
     <section
       ref={containerRef}
-      className={styles.hero}
+      className={styles.hero} id="inicio"
       style={{ "--dx": "0%", "--clip-right": "100%" }}
     >
       {/* ── CAPA BASE: fondo blanco + zorro limpio ── */}
@@ -171,13 +235,26 @@ export default function Hero({ onDividerChange }) {
 
         <motion.h1
           className={styles.headline}
-          style={{ color: dividerX > leftThreshold ? "#f0f8ff" : "#1a2540" }}
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 32 }}
           transition={{ delay: 1.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          El futuro<br />
-          <span className={styles.headlineAccent}>ya no espera.</span>
+          <SplitText
+            text="El futuro"
+            dividerPct={dividerX}
+            containerRef={containerRef}
+            colorLight={headlineLightColor}
+            colorDark={headlineDarkColor}
+          />
+          <br />
+          <SplitText
+            text="ya no espera."
+            dividerPct={dividerX}
+            containerRef={containerRef}
+            colorLight={headlineLightColor}
+            colorDark={headlineDarkColor}
+            className={styles.headlineAccentLine}
+          />
         </motion.h1>
 
         <motion.button
@@ -187,6 +264,7 @@ export default function Hero({ onDividerChange }) {
           transition={{ delay: 1.8, duration: 0.5 }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
+          onClick={() => window.open(WA_URL, "_blank")}
         >
           Empieza ahora →
         </motion.button>
@@ -194,38 +272,35 @@ export default function Hero({ onDividerChange }) {
 
       {/* ── TEXTO + MÉTRICAS DERECHA ── */}
       <div className={styles.textRight} style={{ opacity: ready ? 1 : 0 }}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: ready ? 1 : 0 }}
-          transition={{ delay: 1.6, duration: 0.6 }}
+        <motion.p
+          className={styles.tagline}
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 28 }}
+          transition={{ delay: 1.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <TypingAnimation
-            className={styles.tagline}
-            style={{ color: dividerX < rightThreshold ? "#1a2540" : "#f0f8ff" }}
-            duration={40}
-            delay={1800}
-            showCursor={false}
-            as="p"
-          >
-            Construimos soluciones modernas para tu empresa.
-          </TypingAnimation>
-        </motion.div>
+          <SplitText
+            text="Construimos soluciones modernas para tu empresa."
+            dividerPct={dividerX}
+            containerRef={containerRef}
+            colorLight={taglineLightColor}
+            colorDark={taglineDarkColor}
+          />
+        </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: ready ? 1 : 0 }}
-          transition={{ delay: 2.2, duration: 0.6 }}
+        <motion.p
+          className={styles.taglineSecond}
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 28 }}
+          transition={{ delay: 1.6, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <TypingAnimation
-            className={styles.taglineSecond}
-            duration={35}
-            delay={2400}
-            showCursor={false}
-            as="p"
-          >
-            Innovación que impulsa resultados reales.
-          </TypingAnimation>
-        </motion.div>
+          <SplitText
+            text="Innovación que impulsa resultados reales."
+            dividerPct={dividerX}
+            containerRef={containerRef}
+            colorLight="#7dd4e8"
+            colorDark="#0e7490"
+          />
+        </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -235,13 +310,13 @@ export default function Hero({ onDividerChange }) {
           <BeamSection />
         </motion.div>
 
-        {/* CTA visible only on mobile (desktop CTA is in textLeft) */}
         <motion.button
           className={styles.ctaMobile}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 16 }}
           transition={{ delay: 2.4, duration: 0.5 }}
           whileTap={{ scale: 0.97 }}
+          onClick={() => window.open(WA_URL, "_blank")}
         >
           Empieza ahora →
         </motion.button>

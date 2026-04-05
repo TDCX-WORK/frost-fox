@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
+import { Link } from "react-router-dom"
 import { Building2, UserCog, BookOpen, FileText, GraduationCap, Trophy } from "lucide-react"
 import styles from "./Academy.module.css"
+
+const WA_URL = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostFox, me gustaría solicitar una demo de FrostFox Academy.")}`
 
 // ─────────────────────────────────────────────────────────────
 // PARTICLES (sin dependencia externa — CSS + canvas puro)
@@ -89,6 +92,15 @@ function Particles() {
 // ─────────────────────────────────────────────────────────────
 // SHINE BORDER WRAPPER (siempre activo — overflow:hidden trick)
 // ─────────────────────────────────────────────────────────────
+
+// Convierte hex a rgba con alpha
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+
 function ShineCard({ children, color = "#2ab8d4", speed = 3, className = "" }) {
   return (
     <div className={`${styles.shineWrapper} ${className}`}>
@@ -99,7 +111,13 @@ function ShineCard({ children, color = "#2ab8d4", speed = 3, className = "" }) {
           animationDuration: `${speed}s`,
         }}
       />
-      <div className={styles.shineInner}>{children}</div>
+      <div
+        className={styles.shineInner}
+        style={{
+          "--card-overlay-0":  hexToRgba(color, 0.18),
+          "--card-overlay-50": hexToRgba(color, 0.07),
+        }}
+      >{children}</div>
     </div>
   )
 }
@@ -633,17 +651,19 @@ function RoleSection({ role, index }) {
 // PIPELINE — circular progress steps with Lucide icons
 // ─────────────────────────────────────────────────────────────
 const PIPELINE = [
-  { label: "Academia",    Icon: Building2,     pct: 100, color: "#0891b2" },
-  { label: "Director",    Icon: UserCog,       pct: 100, color: "#7c3aed" },
-  { label: "Profesores",  Icon: BookOpen,      pct: 100, color: "#0369a1" },
-  { label: "Asignatura",  Icon: FileText,      pct: 85,  color: "#059669" },
-  { label: "Alumnos",     Icon: GraduationCap, pct: 72,  color: "#d97706" },
-  { label: "Éxito",       Icon: Trophy,        pct: 94,  color: "#dc2626" },
+  { label: "Alta en 48h",    Icon: Building2,     pct: 48,  unit: "h",  color: "#0891b2", desc: "De contrato a academia operativa" },
+  { label: "Temario propio",  Icon: FileText,     pct: 700, unit: "+",  color: "#7c3aed", desc: "De la academia o del BOE" },
+  { label: "3 paneles",      Icon: UserCog,       pct: 3,   unit: "",   color: "#0369a1", desc: "Alumno · Profesor · Director" },
+  { label: "Tests adaptativos", Icon: BookOpen,   pct: 500, unit: "+",  color: "#059669", desc: "Por asignatura y nivel" },
+  { label: "Retención",      Icon: GraduationCap, pct: 100, unit: "%",  color: "#d97706", desc: "De alumnos en la plataforma" },
+  { label: "Aprobados",      Icon: Trophy,        pct: 96,  unit: "%",  color: "#dc2626", desc: "Tasa de éxito con la plataforma" },
 ]
 
 function PipelineStep({ step, index, total }) {
   const r = 38
   const circ = 2 * Math.PI * r
+  // For display: normalize visual fill (caps at ~90% visually so it looks proportional)
+  const visualPct = step.unit === "h" ? 60 : step.unit === "+" ? 95 : step.unit === "" ? 55 : step.pct
   return (
     <motion.div
       className={styles.pipeStep}
@@ -653,25 +673,31 @@ function PipelineStep({ step, index, total }) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       <div className={styles.pipeCircle}>
+        {/* Glow ring behind */}
+        <div className={styles.pipeGlow} style={{ boxShadow: `0 0 22px ${step.color}40, 0 0 44px ${step.color}18` }} />
         <svg width="96" height="96" viewBox="0 0 96 96">
-          <circle cx="48" cy="48" r={r} fill="none" stroke="#eef2f7" strokeWidth="4" />
+          <circle cx="48" cy="48" r={r} fill="none" stroke={`${step.color}18`} strokeWidth="5" />
           <motion.circle
             cx="48" cy="48" r={r} fill="none"
-            stroke={step.color} strokeWidth="4" strokeLinecap="round"
-            strokeDasharray={`${step.pct / 100 * circ} ${circ}`}
+            stroke={step.color} strokeWidth="5" strokeLinecap="round"
+            strokeDasharray={`${visualPct / 100 * circ} ${circ}`}
             transform="rotate(-90 48 48)"
             initial={{ strokeDasharray: `0 ${circ}` }}
-            whileInView={{ strokeDasharray: `${step.pct / 100 * circ} ${circ}` }}
+            whileInView={{ strokeDasharray: `${visualPct / 100 * circ} ${circ}` }}
             viewport={{ once: true }}
             transition={{ duration: 1.2, delay: index * 0.12 }}
+            style={{ filter: `drop-shadow(0 0 4px ${step.color}99)` }}
           />
         </svg>
-        <div className={styles.pipeIconWrap} style={{ background: `${step.color}10`, color: step.color }}>
-          <step.Icon size={22} strokeWidth={2} />
+        <div className={styles.pipeIconWrap} style={{ background: `${step.color}14`, color: step.color }}>
+          <step.Icon size={22} strokeWidth={1.8} />
         </div>
       </div>
-      <span className={styles.pipePct} style={{ color: step.color }}>{step.pct}%</span>
+      <span className={styles.pipePct} style={{ color: step.color }}>
+        {step.pct}{step.unit}
+      </span>
       <span className={styles.pipeLabel}>{step.label}</span>
+      <span className={styles.pipeDesc}>{step.desc}</span>
       {index < total - 1 && <div className={styles.pipeLine} />}
     </motion.div>
   )
@@ -687,7 +713,7 @@ function PipelineStep({ step, index, total }) {
 // ─────────────────────────────────────────────────────────────
 export default function Academy() {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id="academy">
       <Particles />
 
       <div className={styles.content}>
@@ -741,59 +767,76 @@ export default function Academy() {
           <h3 className={styles.successTitle}>Aumenta la tasa de éxito de tu academia</h3>
 
           <div className={styles.chartWrap}>
-            <span className={styles.chartPeak}>100%</span>
-            <svg className={styles.chartSvg} viewBox="0 0 400 120" preserveAspectRatio="none">
+            <svg className={styles.chartSvg} viewBox="0 0 600 180" preserveAspectRatio="none">
               <defs>
-                <linearGradient id="areaGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#0891b2" stopOpacity="0.06" />
-                  <stop offset="50%" stopColor="#5de4ff" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#c6f620" stopOpacity="0.04" />
-                </linearGradient>
                 <linearGradient id="lineGradAcad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#0891b2" />
-                  <stop offset="50%" stopColor="#5de4ff" />
-                  <stop offset="100%" stopColor="#c6f620" />
+                  <stop offset="0%"   stopColor="#0891b2" />
+                  <stop offset="40%"  stopColor="#5de4ff" />
+                  <stop offset="100%" stopColor="#22d3a5" />
                 </linearGradient>
-                <filter id="glowLine">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
+                <linearGradient id="areaGradAcad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#5de4ff" stopOpacity="0.13" />
+                  <stop offset="100%" stopColor="#5de4ff" stopOpacity="0" />
+                </linearGradient>
+                <filter id="glowLine2">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
               </defs>
-              {/* Area fill */}
+
+              {/* Grid lines */}
+              {[30, 70, 110, 155].map(y => (
+                <line key={y} x1="0" y1={y} x2="600" y2={y}
+                  stroke="rgba(100,116,139,0.1)" strokeWidth="1" strokeDasharray="4 6" />
+              ))}
+
+              {/* Area bajo la línea — fade suave */}
               <motion.path
-                d="M0,105 C20,102 35,98 55,94 C75,90 85,88 105,82 C130,75 145,78 165,72 C190,65 205,60 225,54 C250,47 265,50 285,42 C310,33 325,28 345,20 C365,13 380,10 400,5 L400,120 L0,120 Z"
-                fill="url(#areaGrad)"
+                d="M20,162 C60,156 100,144 150,130 C200,116 240,110 280,96 C320,82 360,66 400,52 C440,38 480,28 560,18 L560,180 L20,180 Z"
+                fill="url(#areaGradAcad)"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1.2 }}
+                transition={{ duration: 1.0, delay: 0.3 }}
               />
-              {/* Main line */}
+
+              {/* Línea principal */}
               <motion.path
-                d="M0,105 C20,102 35,98 55,94 C75,90 85,88 105,82 C130,75 145,78 165,72 C190,65 205,60 225,54 C250,47 265,50 285,42 C310,33 325,28 345,20 C365,13 380,10 400,5"
+                d="M20,162 C60,156 100,144 150,130 C200,116 240,110 280,96 C320,82 360,66 400,52 C440,38 480,28 560,18"
                 fill="none"
                 stroke="url(#lineGradAcad)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
-                filter="url(#glowLine)"
+                strokeLinejoin="round"
+                filter="url(#glowLine2)"
                 initial={{ pathLength: 0 }}
                 whileInView={{ pathLength: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
               />
-              {/* End dot */}
-              <motion.circle
-                cx="400" cy="5" r="5"
-                fill="#c6f620"
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 1.4, duration: 0.3 }}
-                style={{ filter: "drop-shadow(0 0 6px #c6f620)" }}
-              />
+
+              {/* Puntos de datos con labels */}
+              {[
+                { x: 20,  y: 162, val: "0%" },
+                { x: 150, y: 130, val: "30%" },
+                { x: 280, y: 96,  val: "58%" },
+                { x: 400, y: 52,  val: "80%" },
+                { x: 560, y: 18,  val: "96%" },
+              ].map((pt, i) => (
+                <motion.g key={i}
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.8 + i * 0.2, duration: 0.3 }}
+                >
+                  <circle cx={pt.x} cy={pt.y} r="5" fill="#0a1628" stroke="#5de4ff" strokeWidth="2"
+                    style={{ filter: "drop-shadow(0 0 6px rgba(93,228,255,0.7))" }} />
+                  <text x={pt.x} y={pt.y - 12} textAnchor="middle"
+                    fill="#5de4ff" fontSize="9" fontFamily="Syne,sans-serif" fontWeight="700">
+                    {pt.val}
+                  </text>
+                </motion.g>
+              ))}
             </svg>
           </div>
         </motion.div>
@@ -802,8 +845,8 @@ export default function Academy() {
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.2 }}
         >
-          <button className={styles.ctaPrimary}>Solicitar demo →</button>
-          <button className={styles.ctaSecondary}>Ver precios</button>
+          <button className={styles.ctaPrimary} onClick={() => window.open(WA_URL, "_blank")}>Solicitar demo →</button>
+          <Link to="/academy" className={styles.ctaSecondary}>Ver precios</Link>
         </motion.div>
       </div>
     </section>

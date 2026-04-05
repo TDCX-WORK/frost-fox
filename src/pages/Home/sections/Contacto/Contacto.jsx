@@ -1,12 +1,31 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { motion } from "motion/react"
-import { Zap, Lock, BadgeEuro } from "lucide-react"
+import { Zap, Lock, BadgeEuro, MessageCircle, Mail, Phone } from "lucide-react"
 import { Meteors } from "@/components/ui/meteors"
 import styles from "./Contacto.module.css"
 import personPointing from "../../../../assets/person-pointing.webp"
 
 // ─────────────────────────────────────────────────────────────
-// BORDER BEAM WRAPPER — idéntico al de Talent
+// DATOS DE CONTACTO — editar aquí
+// ─────────────────────────────────────────────────────────────
+const PHONE_RAW   = "34641747308"           // sin + ni espacios
+const PHONE_SHOW  = "+34 641 74 73 08"
+const EMAIL       = "frostfoxlabs@gmail.com"
+const WA_DEFAULT  = `https://wa.me/${PHONE_RAW}?text=${encodeURIComponent("Hola FrostFox, me gustaría obtener más información sobre vuestros servicios.")}`
+
+// ─────────────────────────────────────────────────────────────
+// EMAILJS CONFIG — crea cuenta gratis en emailjs.com
+//   1. Crea un servicio Gmail y copia el Service ID
+//   2. Crea una plantilla con variables: {{nombre}}, {{empresa}},
+//      {{email}}, {{servicio}}, {{mensaje}}
+//   3. Copia el Template ID y el Public Key
+// ─────────────────────────────────────────────────────────────
+const EMAILJS_SERVICE_ID  = "TU_SERVICE_ID"    // ej: "service_abc123"
+const EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID"   // ej: "template_xyz789"
+const EMAILJS_PUBLIC_KEY  = "TU_PUBLIC_KEY"    // ej: "aBcDeFgHiJkLmNoP"
+
+// ─────────────────────────────────────────────────────────────
+// BORDER BEAM WRAPPER
 // ─────────────────────────────────────────────────────────────
 function BorderBeamWrapper({ children }) {
   return (
@@ -27,12 +46,11 @@ function BorderBeamWrapper({ children }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// PERSON CARD — estilos exactos de Talent, muñeco señalando
+// PERSON CARD
 // ─────────────────────────────────────────────────────────────
 function PersonCard() {
   return (
     <BorderBeamWrapper>
-      {/* Halos SVG — idénticos a Talent */}
       <svg className={styles.halosSvg} viewBox="0 0 400 500" fill="none">
         <defs>
           <radialGradient id="cOuter" cx="50%" cy="62%" r="50%">
@@ -85,20 +103,18 @@ function PersonCard() {
           transition={{ duration:3.7, repeat:Infinity, ease:"easeInOut", delay:0.6 }} />
       </svg>
 
-      {/* Muñeco centrado, señalando a la derecha */}
       <img src={personPointing} alt="FrostFox" className={styles.personImg} />
 
-      {/* Badge arriba izquierda */}
       <div className={styles.personBadge}>
         <span className={styles.badgeDot} />
         <span>Disponible ahora</span>
       </div>
 
-      {/* Info glass — puede pisar ligeramente el pie */}
+      {/* Info */}
       <div className={styles.personInfo}>
         <div className={styles.infoItem}>
           <Zap size={13} color="#5de4ff" strokeWidth={2} />
-          <span>Respuesta en 24h</span>
+          <span>Respuesta en menos de 24h</span>
         </div>
         <div className={styles.infoItem}>
           <Lock size={13} color="#5de4ff" strokeWidth={2} />
@@ -114,22 +130,25 @@ function PersonCard() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FORM FIELD
+// FIELD
 // ─────────────────────────────────────────────────────────────
-function Field({ label, type = "text", placeholder, name, textarea = false }) {
+function Field({ label, type = "text", placeholder, name, textarea = false, value, onChange, required }) {
   const [focused, setFocused] = useState(false)
   const Tag = textarea ? "textarea" : "input"
   return (
     <div className={`${styles.field} ${focused ? styles.fieldFocused : ""}`}>
-      <label className={styles.fieldLabel}>{label}</label>
+      <label className={styles.fieldLabel}>{label}{required && <span style={{ color: "#5de4ff" }}> *</span>}</label>
       <Tag
         name={name}
         type={!textarea ? type : undefined}
         placeholder={placeholder}
         className={styles.fieldInput}
         rows={textarea ? 4 : undefined}
+        value={value}
+        onChange={onChange}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        required={required}
       />
       <motion.div
         className={styles.fieldLine}
@@ -141,10 +160,63 @@ function Field({ label, type = "text", placeholder, name, textarea = false }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CONTACTO
+// CONTACTO PRINCIPAL
 // ─────────────────────────────────────────────────────────────
 export default function Contacto() {
-  const [sent, setSent] = useState(false)
+  const [sent, setSent]       = useState(false)
+  const [error, setError]     = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [privacy, setPrivacy] = useState(false)
+  const [form, setForm]       = useState({
+    nombre: "", empresa: "", email: "", servicio: "", mensaje: ""
+  })
+
+  const handleChange = (e) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!privacy) return
+    setLoading(true)
+    setError(false)
+
+    try {
+      // Carga EmailJS dinámicamente (no necesitas instalarlo si lo cargas así)
+      const emailjs = await import("https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js")
+        .catch(() => null)
+
+      // Alternativa: usar fetch directo a la API de EmailJS
+      const payload = {
+        service_id:  EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id:     EMAILJS_PUBLIC_KEY,
+        template_params: {
+          nombre:   form.nombre,
+          empresa:  form.empresa || "No indicada",
+          email:    form.email,
+          servicio: form.servicio || "No especificado",
+          mensaje:  form.mensaje,
+        }
+      }
+
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(payload),
+      })
+
+      if (res.ok) {
+        setSent(true)
+      } else {
+        throw new Error("EmailJS error")
+      }
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <section className={styles.section} id="contacto">
@@ -175,6 +247,25 @@ export default function Contacto() {
             Sin formularios eternos. Sin esperas. Cuéntanos qué necesitas
             y en menos de 24h tienes una propuesta real.
           </motion.p>
+
+          {/* Accesos rápidos */}
+          <motion.div className={styles.quickAccess}
+            initial={{ opacity:0, y:12 }} whileInView={{ opacity:1, y:0 }}
+            viewport={{ once:true }} transition={{ duration:0.5, delay:0.24 }}
+          >
+            <a href={WA_DEFAULT} target="_blank" rel="noopener noreferrer" className={styles.quickWa}>
+              <MessageCircle size={16} strokeWidth={2} />
+              WhatsApp directo
+            </a>
+            <a href={`tel:+${PHONE_RAW}`} className={styles.quickPhone}>
+              <Phone size={16} strokeWidth={2} />
+              {PHONE_SHOW}
+            </a>
+            <a href={`mailto:${EMAIL}`} className={styles.quickEmail}>
+              <Mail size={16} strokeWidth={2} />
+              {EMAIL}
+            </a>
+          </motion.div>
         </div>
 
         {/* SPLIT */}
@@ -194,16 +285,32 @@ export default function Contacto() {
             viewport={{ once:true }} transition={{ duration:0.75, delay:0.1, ease:[0.16,1,0.3,1] }}
           >
             <div className={styles.formCard}>
-              {!sent ? (
-                <form className={styles.form} onSubmit={(e) => { e.preventDefault(); setSent(true) }}>
+              {sent ? (
+                <motion.div className={styles.successMsg}
+                  initial={{ opacity:0, scale:0.92 }} animate={{ opacity:1, scale:1 }}
+                  transition={{ duration:0.5, ease:[0.16,1,0.3,1] }}
+                >
+                  <div className={styles.successIcon}>✓</div>
+                  <h3 className={styles.successTitle}>¡Mensaje enviado!</h3>
+                  <p className={styles.successBody}>
+                    Te contestamos en menos de 24h en el correo <strong>{form.email}</strong>.<br />
+                    También puedes escribirnos directamente por WhatsApp.
+                  </p>
+                  <a href={WA_DEFAULT} target="_blank" rel="noopener noreferrer" className={styles.successWa}>
+                    <MessageCircle size={15} />
+                    Escribir por WhatsApp
+                  </a>
+                </motion.div>
+              ) : (
+                <form className={styles.form} onSubmit={handleSubmit}>
                   <div className={styles.formRow}>
-                    <Field label="Nombre"  placeholder="Tu nombre"    name="nombre"  />
-                    <Field label="Empresa" placeholder="Tu empresa"   name="empresa" />
+                    <Field label="Nombre"  placeholder="Tu nombre"   name="nombre"  value={form.nombre}  onChange={handleChange} required />
+                    <Field label="Empresa" placeholder="Tu empresa"  name="empresa" value={form.empresa} onChange={handleChange} />
                   </div>
-                  <Field label="Email" type="email" placeholder="tu@empresa.com" name="email" />
+                  <Field label="Email" type="email" placeholder="tu@empresa.com" name="email" value={form.email} onChange={handleChange} required />
                   <div className={styles.selectWrap}>
                     <label className={styles.fieldLabel}>Servicio</label>
-                    <select className={styles.select} name="servicio">
+                    <select className={styles.select} name="servicio" value={form.servicio} onChange={handleChange}>
                       <option value="">¿Qué necesitas?</option>
                       <option value="webdev">FrostFox WebDev — Web o App</option>
                       <option value="academy">FrostFox Academy — SaaS B2B</option>
@@ -211,22 +318,53 @@ export default function Contacto() {
                       <option value="otro">Otro / No lo sé aún</option>
                     </select>
                   </div>
-                  <Field label="Mensaje" placeholder="Cuéntanos tu proyecto, situación o duda..." name="mensaje" textarea />
-                  <motion.button type="submit" className={styles.submitBtn}
-                    whileHover={{ scale:1.02, boxShadow:"0 0 40px rgba(93,228,255,0.35)" }}
-                    whileTap={{ scale:0.97 }}
-                  >Enviar mensaje →</motion.button>
-                  <p className={styles.formNote}>Sin spam. Sin intermediarios. Solo nosotros.</p>
+                  <Field label="Mensaje" placeholder="Cuéntanos tu proyecto, situación o duda..." name="mensaje" value={form.mensaje} onChange={handleChange} textarea required />
+
+                  {/* Checkbox RGPD — obligatorio */}
+                  <div className={styles.privacyWrap}>
+                    <button
+                      type="button"
+                      className={`${styles.privacyBox} ${privacy ? styles.privacyBoxChecked : ""}`}
+                      onClick={() => setPrivacy(p => !p)}
+                      aria-label="Aceptar política de privacidad"
+                    >
+                      {privacy && <span className={styles.privacyCheck}>✓</span>}
+                    </button>
+                    <p className={styles.privacyText}>
+                      He leído y acepto la{" "}
+                      <a href="/privacidad" target="_blank" rel="noopener noreferrer" className={styles.privacyLink}>
+                        Política de Privacidad
+                      </a>
+                      {" "}y el tratamiento de mis datos conforme al{" "}
+                      <a href="/privacidad" target="_blank" rel="noopener noreferrer" className={styles.privacyLink}>
+                        RGPD (UE) 2016/679
+                      </a>
+                      . <span className={styles.privacyReq}>*</span>
+                    </p>
+                  </div>
+
+                  {error && (
+                    <div className={styles.errorMsg}>
+                      ⚠️ Error al enviar. Escríbenos directamente a{" "}
+                      <a href={`mailto:${EMAIL}`} className={styles.privacyLink}>{EMAIL}</a>
+                    </div>
+                  )}
+
+                  <motion.button
+                    type="submit"
+                    className={styles.submitBtn}
+                    disabled={loading || !privacy}
+                    style={{ opacity: (!privacy || loading) ? 0.5 : 1 }}
+                    whileHover={privacy && !loading ? { scale:1.02, boxShadow:"0 0 40px rgba(93,228,255,0.35)" } : {}}
+                    whileTap={privacy && !loading ? { scale:0.97 } : {}}
+                  >
+                    {loading ? "Enviando…" : "Enviar mensaje →"}
+                  </motion.button>
+
+                  <p className={styles.formNote}>
+                    Tus datos no se comparten con terceros · Respuesta garantizada en 24h
+                  </p>
                 </form>
-              ) : (
-                <motion.div className={styles.successMsg}
-                  initial={{ opacity:0, scale:0.92 }} animate={{ opacity:1, scale:1 }}
-                  transition={{ duration:0.5, ease:[0.16,1,0.3,1] }}
-                >
-                  <span className={styles.successIcon}>✓</span>
-                  <h3 className={styles.successTitle}>¡Mensaje enviado!</h3>
-                  <p className={styles.successBody}>Te contestamos en menos de 24h.</p>
-                </motion.div>
               )}
             </div>
           </motion.div>

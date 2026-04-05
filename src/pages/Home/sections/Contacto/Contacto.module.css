@@ -84,12 +84,72 @@
   line-height: 1.68;
 }
 
+/* ── ACCESOS RÁPIDOS ── */
+.quickAccess {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.quickWa {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: #25d36615;
+  border: 1px solid #25d36640;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #25d366;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.02em;
+}
+.quickWa:hover { background: #25d36625; transform: translateY(-2px); }
+
+.quickPhone {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: rgba(93,228,255,0.06);
+  border: 1px solid rgba(93,228,255,0.2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(180,210,240,0.7);
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.quickPhone:hover { background: rgba(93,228,255,0.12); transform: translateY(-2px); color: #5de4ff; }
+
+.quickEmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: rgba(93,228,255,0.06);
+  border: 1px solid rgba(93,228,255,0.2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(180,210,240,0.7);
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.quickEmail:hover { background: rgba(93,228,255,0.12); transform: translateY(-2px); color: #5de4ff; }
+
 /* ── SPLIT ── */
 .split {
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: 28px;
-  align-items: stretch;  /* misma altura */
+  align-items: stretch;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -139,7 +199,6 @@
   height: 100%;
 }
 
-/* Halos SVG — idéntico a Talent */
 .halosSvg {
   position: absolute;
   inset: 0;
@@ -149,11 +208,10 @@
   z-index: 1;
 }
 
-/* Muñeco — centrado, ocupa hasta el 90% del alto */
 .personImg {
-  position: absolute;   /* absolute para poder centrarlo de verdad */
+  position: absolute;
   z-index: 2;
-  bottom: 80px;         /* sube desde abajo — aumenta para subir más */
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   height: 82%;
@@ -163,7 +221,6 @@
   filter: brightness(1.05) saturate(1.08);
 }
 
-/* Badge */
 .personBadge {
   position: absolute;
   top: 14px;
@@ -200,7 +257,6 @@
   50%       { opacity: 0.3; }
 }
 
-/* Info glass — position absolute sobre el pie del muñeco */
 .personInfo {
   position: absolute;
   bottom: 16px;
@@ -224,10 +280,13 @@
   font-family: 'DM Sans', sans-serif;
   font-size: 12.5px;
   color: rgba(180,210,240,0.7);
+  text-decoration: none;
+  transition: color 0.2s;
 }
+.infoItem:hover { color: #5de4ff; }
 
 /* ══════════════════════════════════════════════════════════════
-   FORM SIDE — misma altura que personSide via align-items:stretch
+   FORM SIDE
    ══════════════════════════════════════════════════════════════ */
 .formSide {
   height: 100%;
@@ -336,6 +395,71 @@
 .select:focus { border-color: rgba(93,228,255,0.3); }
 .select option { background: #0c1628; color: #e8f4ff; }
 
+/* ── RGPD CHECKBOX ── */
+.privacyWrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: -4px;
+}
+
+.privacyBox {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(93,228,255,0.3);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.privacyBoxChecked {
+  border-color: #5de4ff;
+  background: rgba(93,228,255,0.12);
+}
+
+.privacyCheck {
+  font-size: 11px;
+  color: #5de4ff;
+  line-height: 1;
+}
+
+.privacyText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(180,210,240,0.5);
+  line-height: 1.6;
+}
+
+.privacyLink {
+  color: #5de4ff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s;
+}
+.privacyLink:hover { opacity: 0.75; }
+
+.privacyReq {
+  color: #5de4ff;
+}
+
+/* ── ERROR ── */
+.errorMsg {
+  padding: 12px 15px;
+  border-radius: 10px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #fca5a5;
+  line-height: 1.5;
+}
+
 .submitBtn {
   width: 100%;
   height: 50px;
@@ -349,9 +473,10 @@
   letter-spacing: 0.05em;
   cursor: pointer;
   box-shadow: 0 0 24px rgba(93,228,255,0.2);
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, opacity 0.2s;
   margin-top: 4px;
 }
+.submitBtn:disabled { cursor: not-allowed; }
 
 .formNote {
   font-family: 'DM Sans', sans-serif;
@@ -361,7 +486,7 @@
   letter-spacing: 0.03em;
 }
 
-/* Success */
+/* ── SUCCESS ── */
 .successMsg {
   display: flex;
   flex-direction: column;
@@ -399,6 +524,23 @@
   line-height: 1.65;
 }
 
+.successWa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  background: #25d36618;
+  border: 1px solid #25d36645;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #25d366;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.successWa:hover { background: #25d36628; }
+
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
@@ -415,4 +557,6 @@
   .formCard { padding: 24px 20px; }
   .formRow  { grid-template-columns: 1fr; }
   .title    { font-size: clamp(34px, 10vw, 52px); }
+  .quickAccess { gap: 8px; }
+  .quickWa, .quickPhone, .quickEmail { font-size: 12px; padding: 8px 14px; }
 }

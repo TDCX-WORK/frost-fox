@@ -212,6 +212,25 @@
   height: 400px;
 }
 
+/* Overlay desde abajo con color del rol via CSS var */
+.shineInner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to top,
+    var(--card-overlay-0, rgba(186,230,253,0.55)) 0%,
+    var(--card-overlay-50, rgba(219,243,253,0.25)) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+
+
 /* ── UI BASE (premium) ── */
 .ui {
   padding: 22px;
@@ -219,9 +238,10 @@
   flex-direction: column;
   gap: 14px;
   font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(170deg, #ffffff 0%, #f6f9fc 50%, #eef4f8 100%);
+  background: #ffffff;
   height: 100%;
 }
+
 
 .uiHeader {
   display: flex; align-items: center;
@@ -521,7 +541,7 @@
 .uiTableScore { font-size: 12px; font-weight: 700; min-width: 32px; text-align: right; }
 
 /* ── CTA ── */
-.ctaRow { display: flex; gap: 14px; justify-content: center; margin-top: 64px; }
+.ctaRow { display: flex; gap: 14px; justify-content: center; margin-top: 64px; flex-wrap: wrap; }
 
 .ctaPrimary {
   height: 50px; padding: 0 32px; border-radius: 14px;
@@ -529,17 +549,20 @@
   border: none; font-family: 'Syne', sans-serif;
   font-weight: 700; font-size: 14px; color: #fff;
   cursor: pointer; box-shadow: 0 4px 20px rgba(8,145,178,0.35);
-  transition: all 0.2s;
+  transition: all 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center;
 }
 .ctaPrimary:hover { box-shadow: 0 8px 28px rgba(8,145,178,0.5); transform: translateY(-2px); }
 
 .ctaSecondary {
   height: 50px; padding: 0 28px; border-radius: 14px;
-  background: transparent; border: 1.5px solid rgba(8,145,178,0.3);
-  font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px;
+  background: #fff; border: 1.5px solid rgba(8,145,178,0.35);
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
   color: #0891b2; cursor: pointer; transition: all 0.2s;
+  text-decoration: none; display: inline-flex; align-items: center;
+  box-shadow: 0 2px 8px rgba(8,145,178,0.1);
 }
-.ctaSecondary:hover { border-color: rgba(8,145,178,0.6); background: rgba(8,145,178,0.05); }
+.ctaSecondary:hover { border-color: rgba(8,145,178,0.6); background: rgba(8,145,178,0.05); transform: translateY(-2px); }
 
 /* ═══════════════════════════════════════════════════════════════
    PIPELINE SECTION
@@ -579,10 +602,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   flex: 1;
-  max-width: 140px;
+  max-width: 150px;
 }
 
 .pipeCircle {
@@ -592,6 +615,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pipeGlow {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .pipeIconWrap {
@@ -605,19 +636,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .pipePct {
   font-family: 'Syne', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .pipeLabel {
+  font-family: 'Syne', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1a2540;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.pipeDesc {
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
+  font-size: 10.5px;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 4px;
 }
 
 .pipeLine {
@@ -625,8 +670,8 @@
   top: 48px;
   left: calc(50% + 52px);
   width: calc(100% - 56px);
-  height: 2px;
-  background: linear-gradient(to right, #e2e8f0, #cbd5e1);
+  height: 1.5px;
+  background: linear-gradient(to right, rgba(203,213,225,0.6), rgba(226,232,240,0.3));
   z-index: 0;
 }
 
@@ -681,7 +726,7 @@
    ═══════════════════════════════════════════════════════════════ */
 .successSection {
   margin-top: 64px;
-  max-width: 800px;
+  max-width: 860px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -692,35 +737,22 @@
   font-weight: 700;
   font-size: clamp(1.3rem, 2.8vw, 1.8rem);
   color: #1a2540;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   letter-spacing: -0.02em;
 }
 
 .chartWrap {
   position: relative;
-  padding: 16px 0 0;
-  /* White fade at edges */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-}
-
-.chartPeak {
-  position: absolute;
-  top: -6px;
-  right: 10%;
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1;
-  opacity: 0.06;
-  z-index: 1;
-  pointer-events: none;
+  padding: 32px 0 40px;
+  overflow: hidden;
 }
 
 .chartSvg {
   width: 100%;
-  height: 140px;
+  height: 180px;
   display: block;
+  overflow: hidden;
 }
+
+.chartCaption { display: none; }
 

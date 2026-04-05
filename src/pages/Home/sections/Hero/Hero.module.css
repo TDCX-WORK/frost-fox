@@ -148,6 +148,11 @@
   text-shadow: 0 0 40px rgba(93, 228, 255, 0.45);
 }
 
+/* Línea completa "ya no espera." mantiene el glow cyan en los spans */
+.headlineAccentLine span {
+  text-shadow: 0 0 40px rgba(93, 228, 255, 0.45);
+}
+
 /* ── CTA ── */
 .cta {
   display: inline-flex;
@@ -308,8 +313,12 @@
     top: 37%;
   }
 
-  /* Hide dots on mobile */
-  .dotsWrapper { display: none; }
+  /* Dots en mobile — visibles, recentrados al zorro (top:37%) */
+  .dotsWrapper {
+    display: block;
+    /* Desplazar el origen del wrapper para que los dots sigan al zorro */
+    transform: translateY(-13%);
+  }
 
   /* Headline → top */
   .textLeft {

@@ -2,17 +2,30 @@ import { useRef, useState } from "react"
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "motion/react"
 import { Link } from "react-router-dom"
 import styles from "./Navbar.module.css"
+import ffLogo from "../../assets/ff-logo-azul.webp"
+
+const WA_URL = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostFox, me gustaría obtener más información sobre vuestros servicios.")}`
 
 const NAV_ITEMS = [
-  { label: "Inicio", href: "/" },
-  { label: "Soluciones", href: "/soluciones" },
-  { label: "Academy", href: "/academy" },
-  { label: "Talent", href: "/#talent" },
-  { label: "Nosotros", href: "/nosotros" },
-  { label: "Contacto", href: "/contacto" },
+  { label: "Inicio",    href: "/#inicio" },
+  { label: "Servicios", href: "/#servicios" },
+  { label: "Academy",   href: "/academy", external: false, route: true },
+  { label: "Talent",    href: "/#talent" },
+  { label: "Nosotros",  href: "/#nosotros" },
+  { label: "Contacto",  href: "/#contacto" },
 ]
 
-function DockItem({ label, href, mouseX }) {
+function scrollToSection(href) {
+  const id = href.replace("/#", "")
+  if (id === "inicio" || href === "/") {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+    return
+  }
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: "smooth" })
+}
+
+function DockItem({ label, href, mouseX, route }) {
   const ref = useRef(null)
   const [hovered, setHovered] = useState(false)
 
@@ -38,8 +51,9 @@ function DockItem({ label, href, mouseX }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={styles.dockItem}
+      onClick={() => { if (route) { window.location.href = href } else { scrollToSection(href) } }}
     >
-      <Link to={href} className={styles.dockLink}>
+      <button className={styles.dockLink}>
         <motion.span
           animate={{ letterSpacing: hovered ? "0.06em" : "0.02em" }}
           transition={{ duration: 0.2 }}
@@ -52,7 +66,7 @@ function DockItem({ label, href, mouseX }) {
           animate={{ opacity: hovered ? 1 : 0, scaleX: hovered ? 1 : 0 }}
           transition={{ duration: 0.2 }}
         />
-      </Link>
+      </button>
     </motion.div>
   )
 }
@@ -61,85 +75,105 @@ export default function Navbar() {
   const mouseX = useMotionValue(Infinity)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const LogoContent = ({ extraClass }) => (
+    <Link to="/" className={`${styles.logoFixed} ${extraClass || ""}`}>
+      <img src={ffLogo} alt="FrostFox" className={styles.logoFixedImg} />
+      <span className={styles.logoFixedText}>
+        frost<span className={styles.logoFixedAccent}>fox</span>
+      </span>
+    </Link>
+  )
+
   return (
-    <nav className={styles.navWrapper}>
-      <Link to="/" className={styles.logo}>
-        <div className={styles.logoMark}>FF</div>
-        <span className={styles.logoText}>
-          frost<span className={styles.logoAccent}>fox</span>
-        </span>
-      </Link>
+    <>
+      {/* ── Logo desktop — position fixed, fuera del nav ── */}
+      <LogoContent extraClass={styles.logoDesktop} />
 
-      {/* ── Desktop dock (unchanged) ── */}
-      <motion.div
-        className={styles.dockOuter}
-        onMouseMove={(e) => mouseX.set(e.pageX)}
-        onMouseLeave={() => mouseX.set(Infinity)}
-      >
-        <div className={styles.dockBg}>
-          {NAV_ITEMS.map((item) => (
-            <DockItem key={item.label} mouseX={mouseX} {...item} />
-          ))}
-          <div className={styles.sep} />
-          <motion.button
-            className={styles.ctaBtn}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Empezar →
-          </motion.button>
-        </div>
-      </motion.div>
+      {/* ── Nav principal ── */}
+      <nav className={styles.navWrapper}>
 
-      {/* ── Mobile hamburger ── */}
-      <button
-        className={styles.burger}
-        onClick={() => setMobileOpen(!mobileOpen)}
-        aria-label="Menu"
-      >
-        <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen1 : ""}`} />
-        <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen2 : ""}`} />
-        <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen3 : ""}`} />
-      </button>
+        {/* ── Logo mobile — dentro del nav, izquierda ── */}
+        <LogoContent extraClass={styles.logoMobile} />
 
-      {/* ── Mobile menu ── */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            className={styles.mobileMenu}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {NAV_ITEMS.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-              >
-                <Link
-                  to={item.href}
-                  className={styles.mobileLink}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              </motion.div>
+        {/* ── Desktop dock ── */}
+        <motion.div
+          className={styles.dockOuter}
+          onMouseMove={(e) => mouseX.set(e.pageX)}
+          onMouseLeave={() => mouseX.set(Infinity)}
+        >
+          <div className={styles.dockBg}>
+            {NAV_ITEMS.map((item) => (
+              <DockItem key={item.label} mouseX={mouseX} {...item} />
             ))}
+            <div className={styles.sep} />
             <motion.button
-              className={styles.mobileCta}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.25 }}
-              onClick={() => setMobileOpen(false)}
+              className={styles.ctaBtn}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => window.open(WA_URL, "_blank")}
             >
               Empezar →
             </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+          </div>
+        </motion.div>
+
+        {/* ── Mobile hamburger ── */}
+        <button
+          className={styles.burger}
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Menu"
+        >
+          <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen1 : ""}`} />
+          <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen2 : ""}`} />
+          <span className={`${styles.burgerLine} ${mobileOpen ? styles.burgerLineOpen3 : ""}`} />
+        </button>
+
+        {/* ── Mobile menu ── */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              className={styles.mobileMenu}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {NAV_ITEMS.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.3 }}
+                >
+                  <button
+                    className={styles.mobileLink}
+                    onClick={() => {
+                      if (item.route) {
+                        window.location.href = item.href
+                      } else {
+                        scrollToSection(item.href)
+                      }
+                      setMobileOpen(false)
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                </motion.div>
+              ))}
+              <motion.button
+                className={styles.mobileCta}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.25 }}
+                onClick={() => { window.open(WA_URL, "_blank"); setMobileOpen(false) }}
+              >
+                Empezar →
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </nav>
+    </>
   )
 }

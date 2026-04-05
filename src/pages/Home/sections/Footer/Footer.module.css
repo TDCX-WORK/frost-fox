@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
-   FOOTER — mismo fondo/grid que Clients
+   FOOTER
    ═══════════════════════════════════════════════════════════════ */
 
 .footer {
   position: relative;
-  background: #f4f6f8;        /* igual que Clients */
+  background: #f4f6f8;
   border-radius: 36px 36px 0 0;
   margin-top: -36px;
   z-index: 10;
@@ -12,7 +12,6 @@
   padding: 72px 0 0;
 }
 
-/* Grid patrón — mismo que Clients */
 .grid {
   position: absolute !important;
   inset: 0 !important;
@@ -24,7 +23,6 @@
   mask-image:         radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%) !important;
 }
 
-/* Línea top — igual que Clients::before */
 .topLine {
   position: absolute;
   top: 0; left: 15%; width: 70%; height: 1px;
@@ -38,22 +36,24 @@
   );
 }
 
+/* ── INNER GRID ── */
 .inner {
   position: relative;
   z-index: 2;
   max-width: 1160px;
   margin: 0 auto;
-  padding: 0 48px 64px;
+  padding: 0 48px 56px;
   display: grid;
-  grid-template-columns: 1.8fr repeat(3, 1fr);
+  grid-template-columns: 1.6fr repeat(3, 1fr);
   gap: 48px;
+  align-items: start;
 }
 
 /* ── BRAND ── */
 .brand {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .logoMark {
@@ -86,7 +86,38 @@
   font-size: 13.5px;
   color: #64748b;
   line-height: 1.6;
-  margin-top: 4px;
+  margin: 2px 0 4px;
+}
+
+/* ── CONTACT ── */
+.contactBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.2s;
+  line-height: 1.4;
+}
+.contactItem:hover { color: #2ab8d4; }
+
+.iconWa   { color: #25d366; flex-shrink: 0; }
+.iconBlue { color: #2ab8d4; flex-shrink: 0; }
+
+.sede {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 2px;
 }
 
 /* ── LINK GROUPS ── */
@@ -113,9 +144,33 @@
   text-decoration: none;
   transition: color 0.2s;
   width: fit-content;
+  line-height: 1.5;
+}
+.link:hover { color: #2ab8d4; }
+
+/* ── RGPD BAR ── */
+.rgpdBar {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(42,184,212,0.1);
+  background: rgba(240,248,255,0.5);
+  padding: 14px 48px;
 }
 
-.link:hover { color: #2ab8d4; }
+.rgpdText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.rgpdLink {
+  color: #2ab8d4;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.rgpdLink:hover { opacity: 0.75; }
 
 /* ── BOTTOM BAR ── */
 .bottomBar {
@@ -125,26 +180,88 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 48px;
+  padding: 18px 48px;
   background: rgba(244,246,248,0.8);
+  gap: 16px;
 }
 
 .copy {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   color: #94a3b8;
+  white-space: nowrap;
+}
+
+.bottomLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottomLink {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.bottomLink:hover { color: #2ab8d4; }
+
+.bottomSep {
+  font-size: 12px;
+  color: #cbd5e1;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  .footer { border-radius: 28px 28px 0 0; padding: 56px 0 0; }
-  .inner  {
-    grid-template-columns: 1fr 1fr;
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .inner {
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 36px;
-    padding: 0 24px 48px;
   }
-  .brand  { grid-column: 1 / -1; }
-  .bottomBar { padding: 18px 24px; flex-direction: column; gap: 6px; text-align: center; }
+  .brand { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .contactBlock { margin-top: 0; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .footer { border-radius: 28px 28px 0 0; padding: 48px 0 0; }
+
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 20px;
+    padding: 0 24px 40px;
+  }
+
+  .brand {
+    grid-column: 1 / -1;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .linkGroup {
+    gap: 8px;
+  }
+
+  .rgpdBar { padding: 12px 24px; }
+  .rgpdText { font-size: 11px; }
+
+  .bottomBar {
+    padding: 16px 24px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .copy { white-space: normal; text-align: center; }
+  .bottomLinks { justify-content: center; flex-wrap: wrap; }
+}
+
+@media (max-width: 420px) {
+  .inner { grid-template-columns: 1fr; gap: 24px; }
 }
