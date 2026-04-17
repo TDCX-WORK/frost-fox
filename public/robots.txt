@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# No indexar rutas de utilidad
+Disallow: /privacy
+
+# Sitemap
+Sitemap: https://thefrostfox.com/sitemap.xml

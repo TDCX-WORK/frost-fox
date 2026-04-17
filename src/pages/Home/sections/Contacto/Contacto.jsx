@@ -20,9 +20,9 @@ const WA_DEFAULT  = `https://wa.me/${PHONE_RAW}?text=${encodeURIComponent("Hola 
 //      {{email}}, {{servicio}}, {{mensaje}}
 //   3. Copia el Template ID y el Public Key
 // ─────────────────────────────────────────────────────────────
-const EMAILJS_SERVICE_ID  = "TU_SERVICE_ID"    // ej: "service_abc123"
-const EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID"   // ej: "template_xyz789"
-const EMAILJS_PUBLIC_KEY  = "TU_PUBLIC_KEY"    // ej: "aBcDeFgHiJkLmNoP"
+const EMAILJS_SERVICE_ID  = "service_jhx4fzs"    // ej: "service_abc123"
+const EMAILJS_TEMPLATE_ID = "template_tglseyw"   // ej: "template_xyz789"
+const EMAILJS_PUBLIC_KEY  = "1kHO__QQ6RtHzyLwZ"    // ej: "aBcDeFgHiJkLmNoP"
 
 // ─────────────────────────────────────────────────────────────
 // BORDER BEAM WRAPPER
@@ -103,7 +103,7 @@ function PersonCard() {
           transition={{ duration:3.7, repeat:Infinity, ease:"easeInOut", delay:0.6 }} />
       </svg>
 
-      <img src={personPointing} alt="FrostFox" className={styles.personImg} />
+      <img src={personPointing} alt="FrostFox — agencia de soluciones digitales B2B" className={styles.personImg} />
 
       <div className={styles.personBadge}>
         <span className={styles.badgeDot} />
@@ -182,35 +182,41 @@ export default function Contacto() {
     setError(false)
 
     try {
-      // Carga EmailJS dinámicamente (no necesitas instalarlo si lo cargas así)
-      const emailjs = await import("https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js")
-        .catch(() => null)
-
-      // Alternativa: usar fetch directo a la API de EmailJS
-      const payload = {
-        service_id:  EMAILJS_SERVICE_ID,
-        template_id: EMAILJS_TEMPLATE_ID,
-        user_id:     EMAILJS_PUBLIC_KEY,
-        template_params: {
-          nombre:   form.nombre,
-          empresa:  form.empresa || "No indicada",
-          email:    form.email,
-          servicio: form.servicio || "No especificado",
-          mensaje:  form.mensaje,
-        }
+      const templateParams = {
+        nombre:   form.nombre,
+        empresa:  form.empresa || "No indicada",
+        email:    form.email,
+        servicio: form.servicio || "No especificado",
+        mensaje:  form.mensaje,
       }
 
+      // 1 — Notificación interna a FrostFox
       const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(payload),
+        body:    JSON.stringify({
+          service_id:      EMAILJS_SERVICE_ID,
+          template_id:     EMAILJS_TEMPLATE_ID,
+          user_id:         EMAILJS_PUBLIC_KEY,
+          template_params: templateParams,
+        }),
       })
 
-      if (res.ok) {
-        setSent(true)
-      } else {
-        throw new Error("EmailJS error")
-      }
+      if (!res.ok) throw new Error("EmailJS error")
+
+      // 2 — Auto-reply al cliente
+      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          service_id:      EMAILJS_SERVICE_ID,
+          template_id:     "template_wkns0iv",
+          user_id:         EMAILJS_PUBLIC_KEY,
+          template_params: templateParams,
+        }),
+      })
+
+      setSent(true)
     } catch {
       setError(true)
     } finally {
@@ -309,8 +315,8 @@ export default function Contacto() {
                   </div>
                   <Field label="Email" type="email" placeholder="tu@empresa.com" name="email" value={form.email} onChange={handleChange} required />
                   <div className={styles.selectWrap}>
-                    <label className={styles.fieldLabel}>Servicio</label>
-                    <select className={styles.select} name="servicio" value={form.servicio} onChange={handleChange}>
+                    <label className={styles.fieldLabel} htmlFor="servicio">Servicio</label>
+                    <select className={styles.select} id="servicio" name="servicio" value={form.servicio} onChange={handleChange}>
                       <option value="">¿Qué necesitas?</option>
                       <option value="webdev">FrostFox WebDev — Web o App</option>
                       <option value="academy">FrostFox Academy — SaaS B2B</option>

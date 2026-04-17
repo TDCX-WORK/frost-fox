@@ -195,13 +195,13 @@ export default function Hero({ onDividerChange }) {
       {/* ── CAPA BASE: fondo blanco + zorro limpio ── */}
       <div className={styles.layerBase}>
         <div className={styles.bgWhite} />
-        <img src={foxImg} alt="Frost Fox" className={styles.foxImg} />
+        <img src={foxImg} fetchPriority="high" alt="Mascota FrostFox versión clara — soluciones digitales B2B" className={styles.foxImg} />
       </div>
 
       {/* ── CAPA OSCURA: fondo oscuro + zorro con código ── */}
       <div className={styles.layerDark}>
         <div className={styles.bgDark} />
-        <img src={codeImg} alt="Fox código" className={styles.foxImg} />
+        <img src={codeImg} alt="Mascota FrostFox con código — desarrollo de software" className={styles.foxImg} />
       </div>
 
       {/* ── PUNTOS NEON ── */}

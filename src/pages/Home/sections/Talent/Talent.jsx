@@ -102,7 +102,7 @@ function BeamCard() {
         {/* Col 3 — FF logo */}
         <div className={cn(styles.beamCol, styles.beamColCenter)}>
           <BeamNode ref={ffRef} className={styles.nodeFrostFox} label="FrostFox" sublabel="Nexo estratégico">
-            <img src={ffLogo} alt="FF" className={styles.ffLogoImg} />
+            <img src={ffLogo} alt="FrostFox" className={styles.ffLogoImg} />
           </BeamNode>
         </div>
 
@@ -187,7 +187,7 @@ function PersonCard() {
           transition={{ duration:3.7, repeat:Infinity, ease:"easeInOut", delay:0.6 }} />
       </svg>
 
-      <img src={personTalent} alt="FrostFox Talent" className={styles.personImg} />
+      <img src={personTalent} alt="Profesional incorporándose al equipo a través de FrostFox Talent" className={styles.personImg} width="2160" height="2700" />
 
       <div className={styles.personBadge}>
         <span className={styles.personBadgeDot} />

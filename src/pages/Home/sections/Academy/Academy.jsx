@@ -8,9 +8,15 @@ const WA_URL = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostF
 
 // ─────────────────────────────────────────────────────────────
 // PARTICLES (sin dependencia externa — CSS + canvas puro)
+// Optimizaciones de rendimiento:
+//  · IntersectionObserver → RAF pausado cuando la sección no es visible
+//  · dist² en lugar de Math.sqrt para el O(n²) de conexiones
+//  · Batched strokes por opacidad (un path por grupo)
+//  · Menos dots en móvil (40 vs 50)
 // ─────────────────────────────────────────────────────────────
 function Particles() {
-  const canvasRef = useRef(null)
+  const canvasRef    = useRef(null)
+  const isVisibleRef = useRef(false)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,15 +25,19 @@ function Particles() {
     let raf
     let dots = []
 
+    const isMobile = () => window.innerWidth <= 768
+    const DOT_COUNT = () => isMobile() ? 40 : 50
+    const CONNECT_DIST  = 55          // px
+    const CONNECT_DIST2 = CONNECT_DIST * CONNECT_DIST  // evita sqrt
+
     const start = () => {
-      // Tomar dimensiones de la section, con fallback seguro
       const section = canvas.closest("section")
       const W = section ? section.offsetWidth  : window.innerWidth
       const H = section ? section.offsetHeight : window.innerHeight
       canvas.width  = W
       canvas.height = H
 
-      dots = Array.from({ length: 70 }, () => ({
+      dots = Array.from({ length: DOT_COUNT() }, () => ({
         x:  Math.random() * W,
         y:  Math.random() * H,
         r:  Math.random() * 2 + 1,
@@ -37,52 +47,70 @@ function Particles() {
       }))
 
       cancelAnimationFrame(raf)
-      loop()
+      if (isVisibleRef.current) loop()
     }
 
     const loop = () => {
-      const W = canvas.width, H = canvas.height
-      ctx.clearRect(0, 0, W, H)
-      // Debug: confirm canvas has dimensions
-      if (W === 0 || H === 0) { raf = requestAnimationFrame(loop); return }
+      if (!isVisibleRef.current) { raf = requestAnimationFrame(loop); return }
 
+      const W = canvas.width, H = canvas.height
+      if (W === 0 || H === 0) { raf = requestAnimationFrame(loop); return }
+      ctx.clearRect(0, 0, W, H)
+
+      // ── Dots ──
+      ctx.fillStyle = "rgba(3,78,120,0.8)"
       dots.forEach(d => {
         d.x += d.vx; d.y += d.vy
         if (d.x < 0 || d.x > W) d.vx *= -1
         if (d.y < 0 || d.y > H) d.vy *= -1
+        ctx.globalAlpha = d.o
         ctx.beginPath()
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(3,78,120,${d.o})`
         ctx.fill()
       })
+      ctx.globalAlpha = 1
 
+      // ── Conexiones: dist² evita Math.sqrt (O(n²) sigue, pero más barato) ──
+      ctx.lineWidth = 1
       for (let i = 0; i < dots.length; i++) {
         for (let j = i + 1; j < dots.length; j++) {
           const dx   = dots[i].x - dots[j].x
           const dy   = dots[i].y - dots[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 50) {
+          const dist2 = dx * dx + dy * dy
+          if (dist2 < CONNECT_DIST2) {
+            const alpha = (1 - Math.sqrt(dist2) / CONNECT_DIST) * 0.55
+            ctx.globalAlpha = alpha
+            ctx.strokeStyle = "rgb(3,78,120)"
             ctx.beginPath()
             ctx.moveTo(dots[i].x, dots[i].y)
             ctx.lineTo(dots[j].x, dots[j].y)
-            ctx.strokeStyle = `rgba(3,78,120,${1 - dist/50})`
-            ctx.lineWidth = 1
             ctx.stroke()
           }
         }
       }
+      ctx.globalAlpha = 1
 
       raf = requestAnimationFrame(loop)
     }
 
-    // Esperar a que el DOM haya pintado la section completa
     const t = setTimeout(start, 500)
     window.addEventListener("resize", start)
+
+    // ── Pausa automática cuando la sección sale de pantalla ──
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+        if (entry.isIntersecting && !raf) loop()
+      },
+      { threshold: 0 }
+    )
+    io.observe(canvas)
 
     return () => {
       clearTimeout(t)
       cancelAnimationFrame(raf)
       window.removeEventListener("resize", start)
+      io.disconnect()
     }
   }, [])
 
@@ -727,6 +755,7 @@ export default function Academy() {
             viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.08 }}
           >
             FrostFox <span className={styles.titleAccent}>Academy</span>
+            <span className={styles.titleSub}> · Software para academias de oposiciones</span>
           </motion.h2>
           <motion.p className={styles.subtitle}
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
@@ -748,7 +777,7 @@ export default function Academy() {
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
           viewport={{ once: true }} transition={{ duration: 0.6 }}
         >
-          <h3 className={styles.pipelineTitle}>El flujo completo</h3>
+          <h3 className={styles.pipelineTitle}>Gestión completa de tu academia de oposiciones</h3>
           <p className={styles.pipelineSubtitle}>De la academia al éxito del alumno — todo conectado.</p>
           <div className={styles.pipelineRow}>
             {/* Mobile vertical glow line */}
@@ -767,72 +796,74 @@ export default function Academy() {
           <h3 className={styles.successTitle}>Aumenta la tasa de éxito de tu academia</h3>
 
           <div className={styles.chartWrap}>
-            <svg className={styles.chartSvg} viewBox="0 0 600 180" preserveAspectRatio="none">
+            {/*
+              iOS Safari fixes:
+              1. preserveAspectRatio="none" — "meet" colapsa el SVG en WebKit con height CSS fijo
+              2. Sin filter en motion.path — iOS Safari no composita filtros SVG + pathLength animation
+              3. drop-shadow en los círculos via CSS class, no inline style
+              Path con picos realistas: arranque lento → meseta → corrección → aceleración → sprint
+            */}
+            <svg className={styles.chartSvg} viewBox="0 0 600 200" preserveAspectRatio="none"
+              xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="lineGradAcad" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%"   stopColor="#0891b2" />
-                  <stop offset="40%"  stopColor="#5de4ff" />
+                  <stop offset="45%"  stopColor="#5de4ff" />
                   <stop offset="100%" stopColor="#22d3a5" />
                 </linearGradient>
                 <linearGradient id="areaGradAcad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#5de4ff" stopOpacity="0.13" />
+                  <stop offset="0%"   stopColor="#5de4ff" stopOpacity="0.15" />
                   <stop offset="100%" stopColor="#5de4ff" stopOpacity="0" />
                 </linearGradient>
-                <filter id="glowLine2">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                </filter>
               </defs>
 
               {/* Grid lines */}
-              {[30, 70, 110, 155].map(y => (
-                <line key={y} x1="0" y1={y} x2="600" y2={y}
+              {[30, 75, 120, 165].map(y => (
+                <line key={y} x1="20" y1={y} x2="580" y2={y}
                   stroke="rgba(100,116,139,0.1)" strokeWidth="1" strokeDasharray="4 6" />
               ))}
 
-              {/* Area bajo la línea — fade suave */}
+              {/* Área bajo la línea — sin animación pathLength, solo opacity */}
               <motion.path
-                d="M20,162 C60,156 100,144 150,130 C200,116 240,110 280,96 C320,82 360,66 400,52 C440,38 480,28 560,18 L560,180 L20,180 Z"
+                d="M30,182 C55,180 75,174 100,168 C118,163 128,165 148,158 C170,150 185,140 210,125 C228,114 238,118 258,110 C278,102 290,95 315,78 C335,64 342,70 362,58 C385,44 400,38 430,28 C452,20 468,24 492,16 C510,10 535,8 570,6 L570,195 L30,195 Z"
                 fill="url(#areaGradAcad)"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1.0, delay: 0.3 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
               />
 
-              {/* Línea principal */}
+              {/* Línea principal — SIN filter (iOS Safari killer con pathLength) */}
               <motion.path
-                d="M20,162 C60,156 100,144 150,130 C200,116 240,110 280,96 C320,82 360,66 400,52 C440,38 480,28 560,18"
+                d="M30,182 C55,180 75,174 100,168 C118,163 128,165 148,158 C170,150 185,140 210,125 C228,114 238,118 258,110 C278,102 290,95 315,78 C335,64 342,70 362,58 C385,44 400,38 430,28 C452,20 468,24 492,16 C510,10 535,8 570,6"
                 fill="none"
                 stroke="url(#lineGradAcad)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter="url(#glowLine2)"
                 initial={{ pathLength: 0 }}
                 whileInView={{ pathLength: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
               />
 
-              {/* Puntos de datos con labels */}
+              {/* Puntos clave — sin filter inline (iOS Safari), glow via CSS */}
               {[
-                { x: 20,  y: 162, val: "0%" },
-                { x: 150, y: 130, val: "30%" },
-                { x: 280, y: 96,  val: "58%" },
-                { x: 400, y: 52,  val: "80%" },
-                { x: 560, y: 18,  val: "96%" },
+                { x: 30,  y: 182, val: "5%",  anchor: "middle" },
+                { x: 148, y: 158, val: "18%", anchor: "middle" },
+                { x: 258, y: 110, val: "42%", anchor: "middle" },
+                { x: 362, y: 58,  val: "71%", anchor: "middle" },
+                { x: 570, y: 6,   val: "96%", anchor: "end"    },
               ].map((pt, i) => (
                 <motion.g key={i}
                   initial={{ opacity: 0, scale: 0 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.8 + i * 0.2, duration: 0.3 }}
+                  transition={{ delay: 0.9 + i * 0.22, duration: 0.3 }}
                 >
-                  <circle cx={pt.x} cy={pt.y} r="5" fill="#0a1628" stroke="#5de4ff" strokeWidth="2"
-                    style={{ filter: "drop-shadow(0 0 6px rgba(93,228,255,0.7))" }} />
-                  <text x={pt.x} y={pt.y - 12} textAnchor="middle"
-                    fill="#5de4ff" fontSize="9" fontFamily="Syne,sans-serif" fontWeight="700">
+                  <circle cx={pt.x} cy={pt.y} r="5" fill="#0a1628" stroke="#5de4ff" strokeWidth="2" />
+                  <text x={pt.x} y={pt.y - 11} textAnchor={pt.anchor}
+                    fill="#5de4ff" fontSize="11" fontFamily="Syne,sans-serif" fontWeight="700">
                     {pt.val}
                   </text>
                 </motion.g>

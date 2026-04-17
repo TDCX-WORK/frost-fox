@@ -26,14 +26,15 @@
   );
 }
 
-/* ── Flickering grid ── */
+/* ── Dot grid CSS — cero JS, cero RAF, cero CPU después del primer paint ── */
 .gridWrap {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* Fade en todos los bordes — mismo patrón que Clients */
-  /* Visible en el centro, se desvanece hacia los 4 bordes */
+  background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.35;
   -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 45%, transparent 100%);
   mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 45%, transparent 100%);
 }
@@ -78,7 +79,7 @@
 .headline {
   font-family: 'Syne', sans-serif;
   font-size: clamp(52px, 7vw, 88px);
-  font-weight: 800;
+  font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.035em;
   color: #0f172a;
@@ -193,9 +194,7 @@
   cursor: default;
   overflow: hidden;
   min-height: 280px;
-  /* entrance animation */
   animation: pilarIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  /* GPU layer — prevents hover from triggering repaints on siblings */
   isolation: isolate;
 }
 
@@ -204,15 +203,14 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Fondo oscuro — GPU opacity only */
+/* Fondo oscuro — solo opacity, GPU composited */
 .pilarBg {
   position: absolute;
   inset: 0;
   background: #0f172a;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.28s ease;
-  /* force own compositing layer */
+  transition: opacity 0.3s ease;
   will-change: opacity;
   transform: translateZ(0);
 }
@@ -228,16 +226,18 @@
   z-index: 1;
 }
 
+/* ── Texto: SIN transition color/background — son repaints CPU ──
+   El cambio es instantáneo; el ojo sigue el fade del fondo y no lo nota.
+   Solo animamos opacity y transform (GPU). */
 .pilarNum {
   font-family: 'Syne', sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: #cbd5e1;
   letter-spacing: 0.1em;
-  transition: color 0.25s ease;
 }
 
-.pilarCard:hover .pilarNum { color: #475569; }
+.pilarCard:hover .pilarNum { color: #64748b; }
 
 .pilarTag {
   font-family: 'Syne', sans-serif;
@@ -252,30 +252,29 @@
   border-radius: 999px;
   position: relative;
   z-index: 1;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .pilarCard:hover .pilarTag {
-  background: rgba(37,99,235,0.15);
+  background: rgba(93,228,255,0.12);
   color: #93c5fd;
-  border-color: rgba(37,99,235,0.3);
+  border-color: rgba(93,228,255,0.25);
 }
 
 .pilarHeadline {
   font-family: 'Syne', sans-serif;
   font-size: clamp(20px, 2vw, 26px);
-  font-weight: 800;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.18;
   letter-spacing: -0.025em;
   position: relative;
   z-index: 1;
-  transition: color 0.25s ease;
   flex: 1;
 }
 
 .pilarCard:hover .pilarHeadline { color: #f1f5f9; }
 
+/* pilarBody — opacity+transform sí son GPU, estos se quedan */
 .pilarBody {
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
@@ -285,7 +284,7 @@
   z-index: 1;
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16,1,0.3,1);
   will-change: opacity, transform;
 }
 
@@ -294,7 +293,7 @@
   transform: translateY(0);
 }
 
-/* Línea azul inferior */
+/* Línea azul inferior — transform es GPU */
 .pilarLine {
   position: absolute;
   bottom: 0;
@@ -334,7 +333,7 @@
 .ctaHeadline {
   font-family: 'Syne', sans-serif;
   font-size: clamp(56px, 8vw, 96px);
-  font-weight: 800;
+  font-weight: 600;
   color: #0f172a;
   line-height: 0.95;
   letter-spacing: -0.04em;
@@ -518,18 +517,19 @@
   background: rgba(37,99,235,0.12);
 }
 
-/* Panel */
+/* Panel — grid-template-rows: 0fr→1fr es GPU, max-height fuerza layout cada frame */
 .accordionPanel {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.3s ease;
-  will-change: max-height, opacity;
+  transition: grid-template-rows 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.28s ease;
 }
 
+.accordionPanel > * { overflow: hidden; }
+
 .accordionPanelOpen {
-  max-height: 200px;
+  grid-template-rows: 1fr;
   opacity: 1;
 }
 

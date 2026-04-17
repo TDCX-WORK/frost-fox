@@ -79,6 +79,14 @@
 
 .titleAccent { color: #2ab8d4; }
 
+.titleSub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-weight: 400;
+  color: #64748b;
+  letter-spacing: 0;
+}
+
 .subtitle {
   font-family: 'DM Sans', sans-serif;
   font-size: 1rem; color: #64748b;
@@ -709,15 +717,16 @@
     padding: 10px 0;
   }
 
-  /* Bigger circles on mobile */
-  .pipeCircle { width: 88px; height: 88px; flex-shrink: 0; }
-  .pipeCircle svg { width: 88px; height: 88px; }
-  .pipeIconWrap { width: 40px; height: 40px; border-radius: 12px; }
-  .pipeIconWrap svg { width: 20px; height: 20px; }
+  /* Circles en móvil — mismo tamaño que desktop */
+  .pipeCircle { width: 96px; height: 96px; flex-shrink: 0; }
+  .pipeCircle svg { width: 96px; height: 96px; }
+  .pipeIconWrap { width: 44px; height: 44px; border-radius: 14px; }
+  .pipeIconWrap svg { width: 22px; height: 22px; }
 
-  /* Hide labels, show only % */
-  .pipeLabel { display: none; }
-  .pipePct { font-size: 11px; }
+  /* Mostrar label en móvil */
+  .pipeLabel { display: block; font-size: 12px; }
+  .pipePct { font-size: 15px; }
+  .pipeDesc { font-size: 11px; }
   .pipeLine { display: none; }
 }
 
@@ -748,10 +757,21 @@
 }
 
 .chartSvg {
+  display: block;
   width: 100%;
   height: 180px;
-  display: block;
+  /* overflow:hidden — iOS Safari no renderiza bien overflow:visible en SVG */
   overflow: hidden;
+}
+
+/* Glow de los puntos via CSS — evita inline filter que falla en iOS Safari */
+.chartSvg circle {
+  filter: drop-shadow(0 0 5px rgba(93,228,255,0.8));
+}
+
+@media (max-width: 700px) {
+  .chartWrap { padding: 16px 0 24px; }
+  .chartSvg  { height: 160px; }
 }
 
 .chartCaption { display: none; }

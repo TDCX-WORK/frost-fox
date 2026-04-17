@@ -3,14 +3,14 @@ import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import styles from "./Clients.module.css"
 
 const CLIENTS = [
-  { name: "Accenture",   sector: "Consultoría" },
-  { name: "Deloitte",    sector: "Auditoría" },
-  { name: "Iberdrola",   sector: "Energía" },
-  { name: "Santander",   sector: "Banca" },
-  { name: "Telefónica",  sector: "Telecomunicaciones" },
-  { name: "BBVA",        sector: "Banca" },
-  { name: "Mapfre",      sector: "Seguros" },
-  { name: "Repsol",      sector: "Energía" },
+  { name: "Maketa Design",   sector: "Diseño" },
+  { name: "Suites Viena",    sector: "Hotel" },
+  { name: "Ifema",   sector: "Eventos" },
+  { name: "KuLuven",   sector: "Universidad" },
+  { name: "Viena Capellanes",  sector: "Catering" },
+  { name: "OpoNow",        sector: "Academia Oposiciones" },
+  { name: "BlueCap",      sector: "Banca" },
+  { name: "Aula Pragma",      sector: "Academia" },
 ]
 
 export default function Clients() {

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'motion/react'
+
 import {
   Building2, UserCog, BookOpen, FileText, GraduationCap, Trophy,
   CheckCircle, ArrowRight, Zap, Shield, BarChart2, Clock,
@@ -8,8 +10,11 @@ import {
   FolderX, MessageSquareX, UserX, LayoutDashboard, TimerOff, BadgeDollarSign,
   ShieldCheck
 } from 'lucide-react'
+import RoleSection from './RoleSection'
+import FeatureStack from './FeatureStack'
 import ffLogo from '../../assets/ff-logo-azul.webp'
 import styles from './AcademyPage.module.css'
+
 
 const WA_DEMO = `https://wa.me/34641747308?text=${encodeURIComponent("Hola FrostFox, me gustaría solicitar una demo gratuita de FrostFox Academy.")}`
 const WA_PLAN = (plan) => `https://wa.me/34641747308?text=${encodeURIComponent(`Hola FrostFox, me interesa el plan ${plan} de FrostFox Academy.`)}`
@@ -48,7 +53,6 @@ function PainPoint({ icon: Icon, text, delay }) {
       viewport={{ once: true }}
       transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* shimmer border spin */}
       <div className={styles.painShineSpin} />
       <div className={styles.painCardInner}>
         <div className={styles.painIconWrap}>
@@ -60,31 +64,7 @@ function PainPoint({ icon: Icon, text, delay }) {
   )
 }
 
-// ── Feature card ───────────────────────────────────────────────
-function FeatureCard({ icon: Icon, title, desc, color, delay, size = 'normal' }) {
-  return (
-    <motion.div
-      className={`${styles.featureWrapper} ${size === 'wide' ? styles.featureWide : ''}`}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-      style={{ '--card-color': color }}
-    >
-      <div className={styles.featShineSpin} style={{ background: `conic-gradient(${color} 0deg, transparent 60deg, transparent 300deg, ${color} 360deg)` }} />
-      <div className={styles.featureCard}>
-        <div className={styles.featureIcon} style={{ background: `${color}15`, color }}>
-          <Icon size={20} strokeWidth={1.8} />
-        </div>
-        <div className={styles.featureBody}>
-          <div className={styles.featureTitle}>{title}</div>
-          <div className={styles.featureDesc}>{desc}</div>
-        </div>
-        <div className={styles.featureGlow} style={{ background: color }} />
-      </div>
-    </motion.div>
-  )
-}
+
 
 // ── Métrica ────────────────────────────────────────────────────
 function Metric({ value, label, color, delay }) {
@@ -123,113 +103,7 @@ function Step({ num, title, desc, who, delay }) {
 }
 
 // ── Role tab ───────────────────────────────────────────────────
-const ROLES = [
-  {
-    id: 'alumno', label: 'Alumno', color: '#0891b2',
-    icon: GraduationCap,
-    headline: 'El alumno estudia mejor, más rápido y con datos reales.',
-    features: [
-      'Tests autocorregidos con 3 modos: principiante, avanzado y examen',
-      'Repetición espaciada automática de fallos',
-      'Temario interactivo con subrayados y apuntes propios',
-      'Estadísticas detalladas: sesiones, nota media, racha y progreso',
-      'Sistema de XP, misiones y gamificación para mantener la constancia',
-      'Supuestos prácticos con pistas y corrección inmediata',
-    ],
-  },
-  {
-    id: 'profesor', label: 'Profesor', color: '#7c3aed',
-    icon: BookOpen,
-    headline: 'El profesor sabe exactamente quién estudia y quién necesita ayuda.',
-    features: [
-      'Panel con todos los alumnos: nota, sesiones, racha y estado',
-      'Alertas automáticas de alumnos en riesgo de abandono',
-      'Banco de preguntas filtrable por bloque y búsqueda',
-      'Tablón de avisos para comunicar novedades a la clase',
-      'Plan semanal de estudio por bloques temáticos',
-      'Exportar informe PDF completo de la clase',
-    ],
-  },
-  {
-    id: 'director', label: 'Director', color: '#059669',
-    icon: Building2,
-    headline: 'El director tiene visión de negocio real en tiempo real.',
-    features: [
-      'KPIs globales: alumnos activos, nota media, en riesgo, retención',
-      'Rentabilidad por alumno y MRR calculado automáticamente',
-      'Gestión de profesores, asignaturas y códigos de acceso',
-      'Historial de facturas de FrostFox con descarga legal en PDF',
-      'Informes PDF técnicos exportables',
-      'Narrativa inteligente del estado de tu academia',
-    ],
-  },
-]
 
-function RoleSection() {
-  const [active, setActive] = useState('alumno')
-  const role = ROLES.find(r => r.id === active)
-  const Icon = role.icon
-
-  return (
-    <div className={styles.roleWrap}>
-      {/* Tabs */}
-      <div className={styles.roleTabs}>
-        {ROLES.map(r => (
-          <button
-            key={r.id}
-            className={`${styles.roleTab} ${active === r.id ? styles.roleTabActive : ''}`}
-            style={active === r.id ? { color: r.color, borderColor: `${r.color}50`, background: `${r.color}0d` } : {}}
-            onClick={() => setActive(r.id)}
-          >
-            <r.icon size={15} strokeWidth={2} />
-            {r.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Panel */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={active}
-          className={styles.rolePanel}
-          style={{ borderColor: `${role.color}25` }}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.22 }}
-        >
-          {/* Glow top */}
-          <div className={styles.rolePanelGlow} style={{ background: role.color }} />
-
-          <div className={styles.roleHeader}>
-            <div className={styles.roleIconWrap} style={{ background: `${role.color}15`, color: role.color }}>
-              <Icon size={22} strokeWidth={1.8} />
-            </div>
-            <div>
-              <div className={styles.roleLabel} style={{ color: role.color }}>{role.label}</div>
-              <div className={styles.roleHeadline}>{role.headline}</div>
-            </div>
-          </div>
-
-          <div className={styles.roleFeatures}>
-            {role.features.map((f, i) => (
-              <motion.div
-                key={i}
-                className={styles.roleFeature}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-              >
-                <CheckCircle size={14} strokeWidth={2.5} style={{ color: role.color, flexShrink: 0, marginTop: 2 }} />
-                <span>{f}</span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  )
-}
 
 // ── Animated grid pattern para precios ────────────────────────
 function PlansGridPattern() {
@@ -251,18 +125,25 @@ function PlansGridPattern() {
 
 // ── Canvas particles para bento ───────────────────────────────
 function BentoParticles() {
-  const canvasRef = useRef(null)
+  const canvasRef    = useRef(null)
+  const isVisibleRef = useRef(false)
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let raf
+
+    const CONNECT_DIST  = 80
+    const CONNECT_DIST2 = CONNECT_DIST * CONNECT_DIST
+
     const resize = () => {
       const s = canvas.closest('section')
       canvas.width  = s ? s.offsetWidth  : window.innerWidth
       canvas.height = s ? s.offsetHeight : window.innerHeight
     }
     resize()
+
     const dots = Array.from({ length: 55 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -270,52 +151,282 @@ function BentoParticles() {
       vx: (Math.random() - 0.5) * 0.18,
       vy: (Math.random() - 0.5) * 0.18,
     }))
+
     const loop = () => {
+      if (!isVisibleRef.current) { raf = requestAnimationFrame(loop); return }
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = 'rgba(93,228,255,0.35)'
       dots.forEach(d => {
         d.x += d.vx; d.y += d.vy
         if (d.x < 0 || d.x > canvas.width)  d.vx *= -1
         if (d.y < 0 || d.y > canvas.height) d.vy *= -1
         ctx.beginPath()
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(93,228,255,0.35)'
         ctx.fill()
       })
+      ctx.strokeStyle = 'rgb(93,228,255)'
+      ctx.lineWidth = 0.7
       for (let i = 0; i < dots.length; i++) {
         for (let j = i + 1; j < dots.length; j++) {
-          const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y
-          const dist = Math.sqrt(dx*dx + dy*dy)
-          if (dist < 80) {
+          const dx    = dots[i].x - dots[j].x
+          const dy    = dots[i].y - dots[j].y
+          const dist2 = dx * dx + dy * dy
+          if (dist2 < CONNECT_DIST2) {
+            ctx.globalAlpha = 0.12 * (1 - Math.sqrt(dist2) / CONNECT_DIST)
             ctx.beginPath()
             ctx.moveTo(dots[i].x, dots[i].y)
             ctx.lineTo(dots[j].x, dots[j].y)
-            ctx.strokeStyle = `rgba(93,228,255,${0.12 * (1 - dist/80)})`
-            ctx.lineWidth = 0.7
             ctx.stroke()
           }
         }
       }
+      ctx.globalAlpha = 1
       raf = requestAnimationFrame(loop)
     }
+
     const t = setTimeout(loop, 300)
     window.addEventListener('resize', resize)
-    return () => { clearTimeout(t); cancelAnimationFrame(raf); window.removeEventListener('resize', resize) }
+    const io = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting },
+      { threshold: 0 }
+    )
+    io.observe(canvas)
+
+    return () => {
+      clearTimeout(t)
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', resize)
+      io.disconnect()
+    }
   }, [])
+
   return <canvas ref={canvasRef} className={styles.bentoParticles} />
+}
+
+// ── FAQ ───────────────────────────────────────────────────────
+const FAQS = [
+  {
+    q: '¿Cuánto cuesta FrostFox Academy?',
+    a: 'Los planes van desde 69 €/mes (Starter, hasta 30 alumnos) hasta 249 €/mes (Pro, alumnos ilimitados). Todos incluyen una alta única de 149 € que cubre la migración del temario completo y la sesión de onboarding. Precios sin IVA.',
+  },
+  {
+    q: '¿Qué incluye el precio mensual?',
+    a: 'Acceso completo a la plataforma para todos tus alumnos, profesores y el director. Incluye tests autocorregidos, temario estructurado, estadísticas en tiempo real, tablón de avisos, panel de rentabilidad y soporte prioritario. Sin costes adicionales por funcionalidades.',
+  },
+  {
+    q: '¿Hay permanencia o puedo darme de baja cuando quiera?',
+    a: 'No hay permanencia. Puedes darte de baja en cualquier momento sin penalización. Facturamos mes a mes y no retenemos tu dinero si decides cancelar.',
+  },
+  {
+    q: '¿En qué consiste la garantía de 30 días?',
+    a: 'Si en los primeros 30 días no ves valor demostrable en tu academia, te devolvemos el importe del alta (149 €) sin preguntas. Solo tienes que comunicárnoslo.',
+  },
+  {
+    q: '¿Cuánto tarda el alta de mi academia?',
+    a: 'El proceso completo, desde que firmas hasta que tu academia está operativa con el temario migrado, es de 48 horas. Nos encargamos de todo: estructuración del temario, creación de preguntas, configuración de usuarios y sesión de onboarding.',
+  },
+  {
+    q: '¿Tengo que preparar yo el temario o lo hacéis vosotros?',
+    a: 'Solo tienes que mandarnos el programa oficial de la convocatoria (el BOE o el documento de la oposición). Nosotros lo convertimos en bloques, temas y más de 700 preguntas estructuradas con respuestas y explicaciones.',
+  },
+  {
+    q: '¿Qué pasa si mi convocatoria cambia o sale una nueva?',
+    a: 'Las actualizaciones de temario se gestionan directamente con nuestro equipo. Si hay cambios legislativos o sale una nueva convocatoria, coordinamos la migración del contenido actualizado.',
+  },
+  {
+    q: '¿Necesito conocimientos técnicos para usar la plataforma?',
+    a: 'No. FrostFox Academy está diseñada para directores, profesores y alumnos sin perfil técnico. La sesión de onboarding de 30 minutos incluida en el alta es suficiente para que tu equipo domine la plataforma desde el primer día.',
+  },
+  {
+    q: '¿Cuántos alumnos puedo tener en cada plan?',
+    a: 'El plan Starter admite hasta 30 alumnos, Growth hasta 60, Academy hasta 100 y Pro es ilimitado. Si en algún momento superas el límite de tu plan, puedes cambiar de plan en cualquier momento sin penalización.',
+  },
+  {
+    q: '¿Puedo gestionar varias asignaturas u oposiciones a la vez?',
+    a: 'Sí. Desde el plan Growth puedes gestionar varias asignaturas simultáneamente, cada una con su propio temario, banco de preguntas y profesores asignados. El plan Pro no tiene límite de asignaturas.',
+  },
+  {
+    q: '¿Los alumnos pueden estudiar desde el móvil?',
+    a: 'Sí. FrostFox Academy es una plataforma web totalmente responsive. Los alumnos pueden acceder desde cualquier dispositivo — móvil, tablet o escritorio — sin necesidad de instalar ninguna aplicación.',
+  },
+  {
+    q: '¿Cómo funciona la repetición espaciada en FrostFox Academy?',
+    a: 'El sistema analiza automáticamente los fallos de cada alumno en los tests y prioriza esas preguntas en las siguientes sesiones de estudio. El alumno no tiene que configurar nada — el algoritmo se encarga de que repase lo que más necesita en el momento adecuado.',
+  },
+  {
+    q: '¿Puedo exportar informes de mis alumnos en PDF?',
+    a: 'Sí. Tanto el profesor como el director pueden exportar informes completos en PDF con el progreso de cada alumno: sesiones, nota media, racha de estudio, fallos por bloque y evolución temporal. Listos para compartir o archivar.',
+  },
+  {
+    q: '¿Puedo ver una demo antes de contratar?',
+    a: 'Por supuesto. Ofrecemos una demo gratuita de 30 minutos donde te mostramos la plataforma en funcionamiento real, adaptada a tu tipo de academia y convocatoria. Sin compromiso.',
+  },
+]
+
+function FaqSection() {
+  const [open, setOpen] = useState(0)
+  const [expanded, setExpanded] = useState(false)
+
+  const visibleFaqs = expanded ? FAQS : FAQS.slice(0, 4)
+
+  return (
+    <div className={styles.faqWrap}>
+      <div className={styles.faqList}>
+        {visibleFaqs.map((faq, i) => (
+          <motion.div
+            key={i}
+            className={`${styles.faqItem} ${open === i ? styles.faqItemOpen : ''}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.03 }}
+          >
+            <button
+              className={styles.faqQuestion}
+              onClick={() => setOpen(open === i ? null : i)}
+              aria-expanded={open === i}
+            >
+              <span>{faq.q}</span>
+              <motion.span
+                className={styles.faqIcon}
+                animate={{ rotate: open === i ? 45 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                +
+              </motion.span>
+            </button>
+            <AnimatePresence initial={false}>
+              {open === i && (
+                <motion.div
+                  className={styles.faqAnswer}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                >
+                  <p>{faq.a}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </div>
+
+      {!expanded && (
+        <div className={styles.faqFade}>
+          <motion.button
+            className={styles.faqExpandBtn}
+            onClick={() => setExpanded(true)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Ver todas las preguntas
+            <span className={styles.faqExpandArrow}>↓</span>
+          </motion.button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── PÁGINA PRINCIPAL ───────────────────────────────────────────
 export default function AcademyPage() {
-  // Scroll al top al montar
   useEffect(() => { window.scrollTo(0, 0) }, [])
+
+  const schemaFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(faq => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  }
+
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "FrostFox Academy",
+    "url": "https://thefrostfox.com/academy",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "Plataforma SaaS para academias de oposiciones en España. Tests autocorregidos, panel de profesor, estadísticas en tiempo real y visión de negocio para el director.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Starter",
+        "price": "69",
+        "priceCurrency": "EUR",
+        "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" }
+      },
+      {
+        "@type": "Offer",
+        "name": "Growth",
+        "price": "109",
+        "priceCurrency": "EUR",
+        "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" }
+      },
+      {
+        "@type": "Offer",
+        "name": "Academy",
+        "price": "169",
+        "priceCurrency": "EUR",
+        "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" }
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro",
+        "price": "249",
+        "priceCurrency": "EUR",
+        "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" }
+      }
+    ],
+    "provider": {
+      "@type": "Organization",
+      "name": "FrostFox",
+      "url": "https://thefrostfox.com"
+    }
+  }
 
   return (
     <div className={styles.page}>
 
+      <Helmet>
+        <title>FrostFox Academy · Plataforma para academias de oposiciones</title>
+        <meta name="description" content="Software de gestión para academias de oposiciones en España. Tests autocorregidos, seguimiento de alumnos, panel del profesor y visión de negocio real. Alta en 48h." />
+        <link rel="canonical" href="https://thefrostfox.com/academy" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="FrostFox Academy · Plataforma para academias de oposiciones" />
+        <meta property="og:description" content="Software de gestión para academias de oposiciones en España. Tests autocorregidos, seguimiento de alumnos y visión de negocio real. Alta en 48h." />
+        <meta property="og:url" content="https://thefrostfox.com/academy" />
+        <meta property="og:image" content="https://thefrostfox.com/og-image.png" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="FrostFox Academy · Plataforma para academias de oposiciones" />
+        <meta name="twitter:description" content="Software de gestión para academias de oposiciones en España. Tests autocorregidos, seguimiento de alumnos y visión de negocio real." />
+        <meta name="twitter:image" content="https://thefrostfox.com/og-image.png" />
+
+        {/* Schema.org FAQPage */}
+        <script type="application/ld+json">
+          {JSON.stringify(schemaFaq)}
+        </script>
+
+        {/* Schema.org SoftwareApplication */}
+        <script type="application/ld+json">
+          {JSON.stringify(schemaData)}
+        </script>
+      </Helmet>
+
       {/* ── NAVBAR MINI ── */}
       <nav className={styles.nav}>
         <Link to="/" className={styles.navLogo}>
-          <img src={ffLogo} alt="FrostFox" className={styles.navLogoImg} />
+          <img src={ffLogo} alt="Logo FrostFox Academy" className={styles.navLogoImg} />
           <span className={styles.navLogoText}>FrostFox <span className={styles.accent}>Academy</span></span>
         </Link>
         <div className={styles.navActions}>
@@ -328,17 +439,14 @@ export default function AcademyPage() {
 
       {/* ── HERO ── */}
       <section className={styles.hero}>
-        {/* Halos animados */}
         <div className={styles.halosWrap}>
           <Halo size={700} opacity={0.07} duration={22} color="#5de4ff" />
           <Halo size={520} opacity={0.12} duration={16} reverse color="#2563EB" />
           <Halo size={340} opacity={0.20} duration={10} color="#5de4ff" />
           <Halo size={180} opacity={0.30} duration={7}  reverse color="#5de4ff" dotTop={false} />
-          {/* Orb central */}
           <div className={styles.orbCenter} />
         </div>
 
-        {/* Contenido */}
         <div className={styles.heroContent}>
           <motion.div
             className={styles.heroBadge}
@@ -356,8 +464,7 @@ export default function AcademyPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
           >
-            La plataforma que necesita<br />
-            <span className={styles.accentGlow}>tu academia.</span>
+            La plataforma de gestión para <span className={styles.accentGlow}>academias de oposiciones.</span>
           </motion.h1>
 
           <div className={styles.dividerLine} />
@@ -454,48 +561,41 @@ export default function AcademyPage() {
           >
             <span className={styles.pill}>Cómo funciona</span>
             <h2 className={styles.sectionTitle}>
-              Tres paneles.<br />
-              <span className={styles.accent}>Un solo sistema.</span>
+              Software completo:<br />
+              <span className={styles.accent}>alumno, profesor y director.</span>
             </h2>
             <p className={styles.sectionSubtitle}>
               Cada rol tiene exactamente lo que necesita, sin sobrecarga de información.
             </p>
           </motion.div>
-
           <RoleSection />
         </div>
       </section>
 
       {/* ── FEATURES BENTO ── */}
-      <section className={styles.bentoSection}>
-        <BentoParticles />
-        <div className={styles.container} style={{ position: 'relative', zIndex: 2 }}>
-          <motion.div
-            className={styles.sectionHeader}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className={styles.pill}>Funcionalidades</span>
-            <h2 className={styles.sectionTitle}>
-              Todo lo que necesitas,<br />
-              <span className={styles.accent}>desde el primer día.</span>
-            </h2>
-          </motion.div>
+      {/* ── FEATURES BENTO ── */}
+<section className={styles.bentoSection}>
+  <BentoParticles />
+  <div className={styles.container} style={{ position: 'relative', zIndex: 2 }}>
+    <motion.div
+      className={styles.sectionHeader}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+    >
+      <span className={styles.pill}>Funcionalidades</span>
+      <h2 className={styles.sectionTitle}>
+        Todo lo que necesita<br />
+        <span className={styles.accent}>tu academia de oposiciones.</span>
+      </h2>
+    </motion.div>
+    <FeatureStack />
+  </div>
+</section>
 
-          <div className={styles.bentoGrid}>
-            <FeatureCard icon={Zap} title="Alta en 48 horas" desc="De contrato firmado a academia operativa con el temario migrado. Nos encargamos de todo." color="#5de4ff" delay={0.05} size="wide" />
-            <FeatureCard icon={BarChart2} title="Estadísticas en tiempo real" desc="Sesiones, nota media, racha, progreso por bloque. Sin esperar reportes manuales." color="#2563EB" delay={0.10} />
-            <FeatureCard icon={Target} title="Repetición espaciada" desc="El sistema prioriza los fallos de cada alumno automáticamente." color="#7c3aed" delay={0.15} />
-            <FeatureCard icon={Users} title="Multi-academia" desc="Gestiona varias academias, asignaturas y convocatorias desde un mismo panel." color="#059669" delay={0.20} />
-            <FeatureCard icon={Shield} title="Garantía 30 días" desc="Si en 30 días no ves valor demostrable, te devolvemos el alta sin preguntas." color="#f59e0b" delay={0.25} />
-            <FeatureCard icon={TrendingUp} title="Rentabilidad real" desc="MRR, ARR y retención calculados en tiempo real desde los datos de tu academia." color="#ec4899" delay={0.30} />
-            <FeatureCard icon={FileText} title="Facturas legales" desc="Historial de facturas descargables en PDF con modelo legal español (RD 1619/2012)." color="#0891b2" delay={0.35} />
-            <FeatureCard icon={Clock} title="Migración incluida" desc="El temario del BOE o convocatoria, convertido a 700+ preguntas estructuradas." color="#5de4ff" delay={0.40} />
-          </div>
-        </div>
-      </section>
+          
+          
 
       {/* ── PROCESO DE ALTA ── */}
       <section className={styles.section}>
@@ -520,10 +620,10 @@ export default function AcademyPage() {
           </motion.div>
 
           <div className={styles.steps}>
-            <Step num="01" title="Nos mandas el programa oficial" desc="El BOE o la convocatoria de tu oposición. No necesitamos nada más." who="Tú" delay={0.1} />
-            <Step num="02" title="Migramos el temario completo" desc="Bloques, temas y 700+ preguntas clasificadas con respuestas y explicaciones." who="Nosotros" delay={0.2} />
-            <Step num="03" title="Configuramos tu academia" desc="Director, profesores y códigos de acceso para tus alumnos." who="Nosotros" delay={0.3} />
-            <Step num="04" title="Sesión de onboarding (30 min)" desc="Tu equipo domina la plataforma desde el primer día. Incluida en el alta." who="Juntos" delay={0.4} />
+            <Step num="01" title="Nos mandas el programa oficial"    desc="El BOE o la convocatoria de tu oposición. No necesitamos nada más." who="Tú" delay={0.1} />
+            <Step num="02" title="Migramos el temario completo"      desc="Bloques, temas y 700+ preguntas clasificadas con respuestas y explicaciones." who="Nosotros" delay={0.2} />
+            <Step num="03" title="Configuramos tu academia"          desc="Director, profesores y códigos de acceso para tus alumnos." who="Nosotros" delay={0.3} />
+            <Step num="04" title="Sesión de onboarding (30 min)"     desc="Tu equipo domina la plataforma desde el primer día. Incluida en el alta." who="Juntos" delay={0.4} />
           </div>
 
           <motion.div
@@ -546,10 +646,10 @@ export default function AcademyPage() {
       <section className={styles.metricsSection}>
         <div className={styles.container}>
           <div className={styles.metricsGrid}>
-            <Metric value="710+" label="Preguntas por temario migradas" color="#5de4ff" delay={0.0} />
-            <Metric value="48h" label="De contrato a academia operativa" color="#059669" delay={0.1} />
-            <Metric value="30d" label="Garantía de devolución" color="#f59e0b" delay={0.2} />
-            <Metric value="3" label="Paneles: alumno, profesor y director" color="#7c3aed" delay={0.3} />
+            <Metric value="710+" label="Preguntas por temario migradas"       color="#5de4ff" delay={0.0} />
+            <Metric value="48h"  label="De contrato a academia operativa"     color="#059669" delay={0.1} />
+            <Metric value="30d"  label="Garantía de devolución"               color="#f59e0b" delay={0.2} />
+            <Metric value="3"    label="Paneles: alumno, profesor y director"  color="#7c3aed" delay={0.3} />
           </div>
         </div>
       </section>
@@ -635,6 +735,26 @@ export default function AcademyPage() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <section className={styles.faqSection}>
+        <div className={styles.container}>
+          <motion.div
+            className={styles.sectionHeader}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className={styles.pill}>Preguntas frecuentes</span>
+            <h2 className={styles.sectionTitle}>
+              Todo lo que necesitas<br />
+              <span className={styles.accent}>saber antes de empezar.</span>
+            </h2>
+          </motion.div>
+          <FaqSection />
+        </div>
+      </section>
+
       {/* ── CTA FINAL ── */}
       <section className={styles.ctaSection}>
         <div className={styles.halosWrap} style={{ opacity: 0.6 }}>
@@ -646,7 +766,7 @@ export default function AcademyPage() {
         <div className={styles.ctaContent}>
           <motion.img
             src={ffLogo}
-            alt="FrostFox Academy"
+            alt="Logo FrostFox Academy — plataforma para academias de oposiciones"
             className={styles.ctaLogo}
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -660,7 +780,7 @@ export default function AcademyPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Tu academia digital,<br />
+            Tu academia de oposiciones digital,<br />
             <span className={styles.accentGlow}>empieza hoy.</span>
           </motion.h2>
           <motion.p

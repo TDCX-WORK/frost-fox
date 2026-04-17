@@ -304,7 +304,12 @@
   .hero {
     /* Tall enough for: headline → big fox → taglines → tall beam → CTA */
     height: 180vh;
-    height: 180dvh;
+    /* dvh removed: dynamic viewport height resizes with iOS address bar,
+       causing all absolute-positioned children (top:55% etc.) to jump.
+       Plain vh is stable (= lvh on iOS Safari). */
+    z-index: 6;
+    /* Above Clients (z:5) so CTA isn't hidden. Below Services (z:7)
+       so the scroll-driven section still works. */
   }
 
   /* Fox BIG */

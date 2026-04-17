@@ -79,7 +79,7 @@ export default function Services() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className={styles.glow} />
-          <img src={personImg} alt="" className={styles.personImg} />
+          <img src={personImg} alt="Consultor de servicios digitales FrostFox" className={styles.personImg} />
         </motion.div>
 
         <div className={styles.right}>
@@ -153,7 +153,7 @@ export default function Services() {
         {/* Mobile-only person image */}
         <div className={styles.mobilePersonWrap}>
           <div className={styles.mobileGlow} />
-          <img src={personMobileImg} alt="" className={styles.mobilePersonImg} />
+          <img src={personMobileImg} alt="Servicios digitales FrostFox en dispositivo móvil" className={styles.mobilePersonImg} width="3375" height="4219" />
         </div>
       </div>
     </section>

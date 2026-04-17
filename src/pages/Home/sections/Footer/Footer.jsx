@@ -18,6 +18,7 @@ const LINKS = {
   "Empresa": [
     { label: "Nosotros",  href: "/#nosotros" },
     { label: "Contacto",  href: "/#contacto" },
+    { label: "Blog",      href: "/blog"      },
   ],
   "Legal": [
     { label: "Política de Privacidad", href: "/privacidad"  },

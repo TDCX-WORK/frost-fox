@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 import { motion } from "motion/react"
 import styles from "./Nosotros.module.css"
 import ffLogo from "../../../../assets/ff-logo-gris.webp"
-import { FlickeringGrid } from "@/components/ui/flickering-grid"
+
 
 // ─────────────────────────────────────────────────────────────
 // DATOS
@@ -125,16 +125,8 @@ export default function Nosotros() {
   return (
     <section className={styles.section} id="nosotros">
 
-      {/* Flickering grid muy sutil de fondo */}
-      <div className={styles.gridWrap}>
-        <FlickeringGrid
-          squareSize={3}
-          gridGap={8}
-          color="#94a3b8"
-          maxOpacity={0.18}
-          flickerChance={0.09}
-        />
-      </div>
+      {/* Grid CSS — sin JS, sin canvas, sin RAF */}
+      <div className={styles.gridWrap} aria-hidden="true" />
 
       <div className={styles.content}>
 
@@ -188,7 +180,7 @@ export default function Nosotros() {
               animate={{ y: [0, -7, 0] }}
               transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img src={ffLogo} alt="FrostFox" className={styles.logoImg} />
+              <img src={ffLogo} alt="FrostFox" className={styles.logoImg} width="2160" height="2700" />
             </motion.div>
             <motion.svg
               className={styles.logoShadowSvg}

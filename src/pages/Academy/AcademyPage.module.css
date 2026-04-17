@@ -179,13 +179,14 @@
 
 .heroTitle {
   font-family: 'Syne', sans-serif;
-  font-size: clamp(2.6rem, 6vw, 4.8rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
   color: #f0f8ff;
   text-shadow: 0 0 80px rgba(93,228,255,0.2), 0 0 160px rgba(93,228,255,0.08);
   margin: 0;
+  max-width: 640px;
 }
 
 .heroSubtitle {
@@ -300,10 +301,10 @@
 
 .sectionTitle {
   font-family: 'Syne', sans-serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   color: #f0f8ff;
   margin: 0;
 }
@@ -324,6 +325,28 @@
   max-width: 880px;
   margin-left: auto;
   margin-right: auto;
+  position: relative; /* ← añadir */
+}
+
+.painGrid::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 80%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(239, 68, 68, 0.5) 20%,
+    rgba(239, 68, 68, 0.7) 50%,
+    rgba(239, 68, 68, 0.5) 80%,
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4), 0 0 24px rgba(239, 68, 68, 0.2);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Shine-border pain card */
@@ -433,100 +456,7 @@
 }
 
 /* ── ROLE SECTION ── */
-.roleWrap {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
 
-.roleTabs {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.roleTab {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 40px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #7a9db5;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.roleTab:hover { color: #e8f4f8; border-color: rgba(255,255,255,0.15); }
-.roleTabActive { font-weight: 700; }
-
-.rolePanel {
-  background: rgba(13,20,32,0.95);
-  border: 1px solid;
-  border-radius: 24px;
-  padding: 36px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-}
-
-.rolePanelGlow {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  opacity: 0.6;
-}
-
-.roleHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.roleIconWrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.roleLabel {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.roleHeadline {
-  font-size: 17px;
-  font-weight: 600;
-  color: #e8f4f8;
-  line-height: 1.4;
-}
-
-.roleFeatures {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.roleFeature {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13.5px;
-  color: #7a9db5;
-  line-height: 1.4;
-}
 
 /* ── BENTO SECTION ── */
 .bentoSection {
@@ -534,8 +464,12 @@
   padding: 100px 0;
   background: #040a16;
   overflow: hidden;
+  border-radius: 32px;
+  margin: -16px 0;
+  z-index: 2;
+  border: 1px solid rgba(93, 228, 255, 0.15);
+  box-shadow: 0 0 40px rgba(93, 228, 255, 0.06), inset 0 0 40px rgba(93, 228, 255, 0.03);
 }
-
 .bentoParticles {
   position: absolute;
   inset: 0;
@@ -554,99 +488,7 @@
 }
 
 /* outer shine wrapper */
-.featureWrapper {
-  position: relative;
-  border-radius: 22px;
-  padding: 1.5px;
-  overflow: hidden;
-  transition: transform 0.2s;
-}
 
-.featureWrapper:hover { transform: translateY(-3px); }
-
-.featShineSpin {
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  animation: featSpin 6s linear infinite;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.featureWrapper:hover .featShineSpin { opacity: 1; }
-
-@keyframes featSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.featureCard {
-  position: relative;
-  z-index: 1;
-  border-radius: 20.5px;
-  background: rgba(10,17,30,0.98);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  transition: border-color 0.3s;
-}
-
-.featureWrapper:hover .featureCard {
-  border-color: color-mix(in srgb, var(--card-color) 25%, transparent);
-}
-
-.featureWide {
-  grid-column: span 2;
-}
-
-.featureWide .featureCard {
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-}
-
-.featureGlow {
-  position: absolute;
-  top: -16px;
-  left: 8%;
-  right: 8%;
-  height: 32px;
-  border-radius: 50%;
-  filter: blur(12px);
-  opacity: 0.15;
-}
-
-.featureIcon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.featureBody { flex: 1; }
-
-.featureTitle {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #e8f4f8;
-  margin-bottom: 5px;
-}
-
-.featureDesc {
-  font-size: 12.5px;
-  color: #7a9db5;
-  line-height: 1.55;
-}
 
 /* ── STEPS ── */
 .steps {
@@ -763,7 +605,7 @@
 
 .metricVal {
   font-family: 'Syne', sans-serif;
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -1016,10 +858,10 @@
 
 .ctaTitle {
   font-family: 'Syne', sans-serif;
-  font-size: clamp(2.4rem, 5vw, 4rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   color: #f0f8ff;
   margin: 0;
 }
@@ -1083,7 +925,7 @@
     max-width: 100%;
   }
   .heroTitle {
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(1.6rem, 7vw, 2.4rem);
   }
   .heroSubtitle {
     font-size: 0.95rem;
@@ -1113,4 +955,122 @@
   .planCard { padding: 28px 20px; }
   .heroMeta { flex-direction: column; gap: 8px; }
   .container { padding: 0 16px; }
+}
+
+/* ── FAQ ── */
+.faqSection {
+  padding: 100px 0;
+}
+
+.faqList {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(93,228,255,0.1);
+}
+
+.faqItem:first-child {
+  border-top: 1px solid rgba(93,228,255,0.1);
+}
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e8f4f8;
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+
+.faqQuestion:hover {
+  color: #5de4ff;
+}
+
+.faqIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(93,228,255,0.3);
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 400;
+  color: #5de4ff;
+  line-height: 1;
+}
+
+.faqAnswer {
+  overflow: hidden;
+}
+
+.faqAnswer p {
+  padding: 0 0 20px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: #7a9db5;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 680px;
+}
+
+.faqItemOpen .faqQuestion {
+  color: #5de4ff;
+}
+
+.faqWrap {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.faqFade {
+  position: relative;
+  margin-top: -80px;
+  padding-top: 80px;
+  background: linear-gradient(to bottom, transparent, #080c10 70%);
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.faqExpandBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: transparent;
+  border: 1px solid rgba(93,228,255,0.3);
+  border-radius: 100px;
+  color: #5de4ff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.faqExpandBtn:hover {
+  border-color: rgba(93,228,255,0.7);
+  background: rgba(93,228,255,0.05);
+}
+
+.faqExpandArrow {
+  font-size: 14px;
 }
